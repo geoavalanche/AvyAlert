@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    
+	<PreferenceCategory
+		android:title="Alert Options"
+		android:key="alert_options" >
+
+        <CheckBoxPreference
+            android:key="push_notifications"
+            android:summary="Receive push notifications when there is a new advisory"
+            android:title="Push Notifications"
+            android:defaultValue="true" />
+
+        <CheckBoxPreference
+            android:key="vibrate"
+            android:summary="Vibrate when alerting to a new advisory"
+            android:title="Vibrate"
+            android:defaultValue="true" />
+
+    </PreferenceCategory>
+
+	<PreferenceCategory
+		android:title="Avalanche Hazard Options"
+		android:key="rating_options" >
+
+        <CheckBoxPreference
+            android:key="enable_low"
+            android:summary="Alert when risk is LOW"
+            android:title="Low"
+            android:defaultValue="true" />
+
+        <CheckBoxPreference
+            android:key="enable_moderate"
+            android:summary="Alert when risk is MODERATE"
+            android:title="Moderate"
+            android:defaultValue="true" />
+
+        <CheckBoxPreference
+            android:key="enable_considerable"
+            android:summary="Alert when risk is CONSIDERABLE"
+            android:title="Considerable"
+            android:defaultValue="true" />
+
+		<CheckBoxPreference
+            android:key="enable_high"
+            android:summary="Alert when risk is HIGH"
+            android:title="High"
+            android:defaultValue="true" />
+
+		<CheckBoxPreference
+            android:key="enable_extreme"
+            android:summary="Alert when risk is EXTREME"
+            android:title="Extreme"
+            android:defaultValue="true" />
+
+	</PreferenceCategory>
+
+</PreferenceScreen>
