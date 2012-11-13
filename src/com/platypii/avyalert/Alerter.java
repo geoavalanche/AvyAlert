@@ -45,16 +45,19 @@ public class Alerter {
         // Intent to open the advisory in AvyAlert
         PendingIntent openAdvisory = PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), 0);
 
-        Builder builder = new NotificationCompat.Builder(context)
-        .setContentTitle("Avalanche Risk: " + advisory.rating)
-        .setTicker("Avalanche Risk: " + advisory.rating)
-        .setContentText(advisory.getDetails())
-        .setSmallIcon(R.drawable.ic_launcher)
-        .setAutoCancel(true)
-        .setDefaults(Notification.FLAG_SHOW_LIGHTS)
-        .setLights(AvalancheRisk.getColor(advisory.rating), 300, 1000) // On for 300ms, off for 1000ms
-        .setContentIntent(openAdvisory);
-        //.setLargeIcon(aBitmap)
+        Builder builder = new NotificationCompat.Builder(context);
+        builder.setContentTitle("Avalanche Risk: " + advisory.rating);
+        builder.setTicker("Avalanche Risk: " + advisory.rating);
+        builder.setContentText(advisory.getDetails());
+        builder.setSmallIcon(R.drawable.ic_launcher);
+        builder.setAutoCancel(true);
+        builder.setDefaults(Notification.FLAG_SHOW_LIGHTS);
+        if(advisory.rating == Rating.EXTREME)
+            builder.setLights(AvalancheRisk.getColor(advisory.rating), 80, 150); // On for 80ms, off for 150ms
+        else
+            builder.setLights(AvalancheRisk.getColor(advisory.rating), 1200, 8000); // On for 1200ms, off for 8000ms
+        builder.setContentIntent(openAdvisory);
+        //builder.setLargeIcon(aBitmap);
         
         if(prefs.getBoolean("enable_vibrate", true)) {
             builder.setVibrate(new long[] {0, 100, 50, 180});

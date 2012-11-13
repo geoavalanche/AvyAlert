@@ -36,15 +36,15 @@ public class AvalancheRisk {
             case NONE:
                 return 0xffffff;
             case LOW:
-                return 0xccff66;
+                return 0x00ff00;
             case MODERATE:
                 return 0xffff00;
             case CONSIDERABLE:
-                return 0xff9900;
+                return 0xffff00;
             case HIGH:
-                return 0xff5500;
+                return 0xee1100;
             case EXTREME:
-                return 0xdd0000;
+                return 0xcc0000;
             default:
                 return 0xffffff;
         }
