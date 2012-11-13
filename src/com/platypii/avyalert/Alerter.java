@@ -1,10 +1,13 @@
 package com.platypii.avyalert;
 
+import com.platypii.avyalert.AvalancheRisk.Rating;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
 import android.util.Log;
@@ -20,6 +23,25 @@ public class Alerter {
     public static void notifyUser(Context context, Advisory advisory) {
         Log.i("Alerter", "Notifying user");
 
+        // Preferences
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        // Control whether we notify or not
+        if(advisory.rating == Rating.NONE) {
+            Log.i("Alerter", "Rating unknown, skipping notification");
+            return;
+        } else if(advisory.rating == Rating.LOW && !prefs.getBoolean("enable_low", true)) {
+            return;
+        } else if(advisory.rating == Rating.MODERATE && !prefs.getBoolean("enable_moderate", true)) {
+            return;
+        } else if(advisory.rating == Rating.CONSIDERABLE && !prefs.getBoolean("enable_considerable", true)) {
+            return;
+        } else if(advisory.rating == Rating.HIGH && !prefs.getBoolean("enable_high", true)) {
+            return;
+        } else if(advisory.rating == Rating.EXTREME && !prefs.getBoolean("enable_extreme", true)) {
+            return;
+        }
+        
         // Intent to open the advisory in AvyAlert
         PendingIntent openAdvisory = PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), 0);
 
@@ -34,7 +56,7 @@ public class Alerter {
         .setContentIntent(openAdvisory);
         //.setLargeIcon(aBitmap)
         
-        if(true) { // TODO: Check preferences
+        if(prefs.getBoolean("enable_vibrate", true)) {
             builder.setVibrate(new long[] {0, 100, 50, 180});
         }
 

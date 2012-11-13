@@ -45,11 +45,7 @@ public class MainActivity extends Activity {
                 loading.setVisibility(View.GONE);
                 
                 // Notification
-                if(advisory.rating != Rating.NONE) {
-                    Alerter.notifyUser(MainActivity.this, advisory);
-                } else {
-                    Log.i("MainActivity", "Avalanche rating unknown. Skipping notification.");
-                }
+                Alerter.notifyUser(MainActivity.this, advisory);
             }
         }.execute();
         

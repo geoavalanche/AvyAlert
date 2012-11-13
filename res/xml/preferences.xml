@@ -12,7 +12,7 @@
             android:defaultValue="true" />
 
         <CheckBoxPreference
-            android:key="vibrate"
+            android:key="enable_vibrate"
             android:summary="Vibrate when alerting to a new advisory"
             android:title="Vibrate"
             android:defaultValue="true" />
