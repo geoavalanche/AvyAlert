@@ -10,6 +10,7 @@ import com.platypii.avyalert.regions.Region;
  */
 public class Advisory {
 
+    public final String date;
     public final Rating rating;
     public final String details;
     public final Region region;
@@ -17,7 +18,8 @@ public class Advisory {
     public boolean notified = false; // Has the user been notified of this advisory?
     
     
-    public Advisory(Rating rating, String details, Region region) {
+    public Advisory(String date, Rating rating, String details, Region region) {
+        this.date = date;
         this.rating = rating;
         this.details = details;
         this.region = region;

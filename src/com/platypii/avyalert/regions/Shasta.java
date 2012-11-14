@@ -31,13 +31,17 @@ public class Shasta implements Region {
         Document doc = Jsoup.connect(url).get();
         Elements divAdvisory = doc.select("div.forecast-advisory");
         
+        // Parse date
+        Element dateElement = divAdvisory.select("strong").first();
+        String date = dateElement == null? "" : dateElement.text();
+        
         // Parse rating
         Element divRating = divAdvisory.select(".rating div").first();
         Rating rating = divRating == null? Rating.NONE : AvalancheRisk.parseRating(divRating.text()); // TODO: More robust selector
         
         // Parse details
         String details = divAdvisory.text();
-        return new Advisory(rating, details, this);
+        return new Advisory(date, rating, details, this);
 
         // TODO: Download avalanche rose
         

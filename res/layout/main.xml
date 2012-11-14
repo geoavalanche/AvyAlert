@@ -9,34 +9,60 @@
 		android:layout_height="wrap_content"
 		android:layout_gravity="center"
 		android:indeterminate="true" />
+   	
+   	<ScrollView 
+		android:layout_width="match_parent"
+		android:layout_height="match_parent" >
 
-	<RelativeLayout
-	    android:layout_width="match_parent"
-	    android:layout_height="match_parent" >
-
-	    <TextView
-	        android:id="@+id/ratingView"
-	        style="@android:style/TextAppearance.Large"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:gravity="center"
-	        android:padding="2dp"
-	        android:text="@+string/loading"
-	        android:textSize="18pt"
-	        android:layout_alignParentTop="true"
-	        tools:context=".MainActivity" />
+		<RelativeLayout
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content" >
 	
-	    <TextView
-	        android:id="@+id/detailsView"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:layout_centerHorizontal="true"
-	        android:layout_centerVertical="true"
-	        android:padding="2dp"
-	        android:text=""
-	        android:layout_below="@+id/ratingView"
-	        tools:context=".MainActivity" />
-	    	
-	</RelativeLayout>
+		    <ImageView
+		        android:id="@+id/regionView"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:adjustViewBounds="true"
+		        android:padding="0dp"
+		        android:layout_alignParentTop="true" />
+		    
+			<TextView
+		        android:id="@+id/ratingView"
+		        style="@android:style/TextAppearance.Medium"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:gravity="center"
+		        android:padding="2dp"
+		        android:text=""
+		        android:textSize="18pt"
+		        android:layout_below="@+id/regionView" />
+		
+		    <TextView
+		        android:id="@+id/dateView"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:padding="2dp"
+		        android:text=""
+		        android:layout_below="@+id/ratingView" />
+		    
+			<TextView
+		        android:id="@+id/detailsView"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:padding="2dp"
+		        android:text=""
+		        android:layout_below="@+id/dateView" />
+		    
+	   	    <TextView 
+		        android:id="@+id/advisoryCenterLink"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:padding="2dp"
+		        android:layout_below="@+id/detailsView"
+		        android:text="" />
+		    	
+		</RelativeLayout>
+		
+	</ScrollView>
 	
 </FrameLayout>

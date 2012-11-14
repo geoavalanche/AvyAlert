@@ -1,5 +1,6 @@
 package com.platypii.avyalert.regions;
 
+import java.util.Date;
 import android.location.Location;
 import com.platypii.avyalert.Advisory;
 import com.platypii.avyalert.AvalancheRisk.Rating;
@@ -12,13 +13,13 @@ import com.platypii.avyalert.AvalancheRisk.Rating;
 public class TestRegion implements Region {
     private static final String region = "Test Region";
     
-    private Rating rating = Rating.CONSIDERABLE;
+    private Rating rating = Rating.HIGH;
     private String details = "Details...";
     
 
     @Override
     public Advisory getAdvisory() {
-        return new Advisory(rating, details, this);
+        return new Advisory(new Date().toString(), rating, details, this);
     }
 
     @Override
@@ -37,7 +38,7 @@ public class TestRegion implements Region {
 
     @Override
     public String getAdvisoryUrl() {
-        return null;
+        return "http://www.google.com/";
     }
 
 }

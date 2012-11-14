@@ -16,8 +16,8 @@ import com.platypii.avyalert.AvalancheRisk.Rating;
  * Represents a Sierra Avalanche Advisory. Pulls from http.
  * @author platypii
  */
-public class Tahoe implements Region {
-    private static final String region = "Tahoe";
+public class LakeTahoe implements Region {
+    private static final String region = "Lake Tahoe";
     private static final String url = "http://www.sierraavalanchecenter.org/advisory";
     
     
@@ -29,15 +29,19 @@ public class Tahoe implements Region {
         Log.i("ESAC", "Connecting to " + url);
 
         Document doc = Jsoup.connect(url).get();
-        Elements divAdvisory = doc.select("div.forecast-advisory");
+        Elements divAdvisory = doc.select("div.content table");
         
+        // Parse date
+        Element dateElement = divAdvisory.select("strong").first();
+        String date = dateElement == null? "" : dateElement.text();
+
         // Parse rating
         Element divRating = divAdvisory.select(".rating div").first();
         Rating rating = divRating == null? Rating.NONE : AvalancheRisk.parseRating(divRating.text()); // TODO: More robust selector
         
         // Parse details
         String details = divAdvisory.text();
-        return new Advisory(rating, details, this);
+        return new Advisory(date, rating, details, this);
 
         // TODO: Download avalanche rose
         
