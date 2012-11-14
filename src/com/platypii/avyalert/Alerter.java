@@ -49,7 +49,7 @@ public class Alerter {
         builder.setContentTitle("Avalanche Risk: " + advisory.rating);
         builder.setTicker("Avalanche Risk: " + advisory.rating);
         builder.setContentText(advisory.getDetails());
-        builder.setSmallIcon(R.drawable.ic_launcher);
+        builder.setSmallIcon(AvalancheRisk.getImage(advisory.rating));
         builder.setAutoCancel(true);
         builder.setDefaults(Notification.FLAG_SHOW_LIGHTS);
         if(advisory.rating == Rating.EXTREME)

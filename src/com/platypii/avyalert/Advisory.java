@@ -26,23 +26,20 @@ public class Advisory {
     
     /**
      * Load the latest ESAC Advisory
+     * @throws IOException 
      */
-    public Advisory(Context context) {
+    public Advisory(Context context) throws IOException {
         Log.i("ESAC", "Connecting to esavalanche.org");
-        try {
-            Document doc = Jsoup.connect(url).get();
-            Elements divAdvisory = doc.select("div.forecast-advisory");
-            
-            // Parse rating
-            Elements divRating = divAdvisory.select(".rating div");
-            rating = AvalancheRisk.parseRating(divRating.first().text()); // TODO: More robust selector
-            
-            // Parse details
-            details = divAdvisory.text();
 
-        } catch(IOException e) {
-            Log.e("ESAC", "Error loading advisory: " + e);
-        }
+        Document doc = Jsoup.connect(url).get();
+        Elements divAdvisory = doc.select("div.forecast-advisory");
+        
+        // Parse rating
+        Elements divRating = divAdvisory.select(".rating div");
+        rating = AvalancheRisk.parseRating(divRating.first().text()); // TODO: More robust selector
+        
+        // Parse details
+        details = divAdvisory.text();
     }
     
     public String getDetails() {

@@ -15,8 +15,8 @@
 	    android:layout_height="match_parent" >
 
 	    <TextView
-	        android:id="@+id/levelView"
-	        style="?android:attr/textAppearanceLarge"
+	        android:id="@+id/ratingView"
+	        style="@android:style/TextAppearance.Large"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 	        android:gravity="center"
@@ -34,7 +34,7 @@
 	        android:layout_centerVertical="true"
 	        android:padding="@dimen/padding_medium"
 	        android:text=""
-	        android:layout_below="@+id/levelView"
+	        android:layout_below="@+id/ratingView"
 	        tools:context=".MainActivity" />
 	
 	</RelativeLayout>

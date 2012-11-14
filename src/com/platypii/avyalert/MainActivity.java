@@ -1,7 +1,8 @@
 package com.platypii.avyalert;
 
-import com.platypii.avyalert.AvalancheRisk.Rating;
+import java.io.IOException;
 import com.platypii.avyalert.R;
+import com.platypii.avyalert.AvalancheRisk.Rating;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
@@ -14,6 +15,11 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+
+/**
+ * Main application activity
+ * @author platypii
+ */
 public class MainActivity extends Activity {
     
     Advisory latestAdvisory;
@@ -33,15 +39,24 @@ public class MainActivity extends Activity {
             }
             @Override
             protected Advisory doInBackground(Void... params) {
-                return new Advisory(appContext);
+                while(true) {
+                    try {
+                        return new Advisory(appContext);
+                    } catch(IOException e) {
+                        Log.w("MainActivity", "Failed to download advisory");
+                    }
+                    try {
+                        Thread.sleep(8000);
+                    } catch(InterruptedException e) {}
+                }
             }
             @Override
             protected void onPostExecute(Advisory advisory) {
+                
+                advisory.rating = Rating.CONSIDERABLE; // TODO
+                
                 MainActivity.this.latestAdvisory = advisory;
-                TextView levelView = (TextView) findViewById(R.id.levelView);
-                TextView detailsView = (TextView) findViewById(R.id.detailsView);
-                levelView.setText(advisory.toString());
-                detailsView.setText(advisory.getDetails());
+                updateText(advisory);
                 loading.setVisibility(View.GONE);
                 
                 // Notification
@@ -49,6 +64,18 @@ public class MainActivity extends Activity {
             }
         }.execute();
         
+    }
+    
+    /**
+     * Updates the text views with the given advisory
+     */
+    private void updateText(Advisory advisory) {
+        TextView ratingView = (TextView) findViewById(R.id.ratingView);
+        TextView detailsView = (TextView) findViewById(R.id.detailsView);
+        ratingView.setText(advisory.rating.toString());
+        ratingView.setTextColor(0xff000000 + AvalancheRisk.getForegroundColor(advisory.rating));
+        ratingView.setBackgroundColor(AvalancheRisk.getBackgroundColor(advisory.rating));
+        detailsView.setText(advisory.getDetails());
     }
 
     @Override
@@ -58,7 +85,6 @@ public class MainActivity extends Activity {
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
         switch (item.getItemId()) {
             case R.id.menu_settings:
                 startActivity(new Intent(this, SettingsActivity.class));

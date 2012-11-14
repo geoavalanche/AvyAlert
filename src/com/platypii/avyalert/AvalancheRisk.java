@@ -31,22 +31,56 @@ public class AvalancheRisk {
         }
     }
     
-    public static int getColor(Rating level) {
-        switch(level) {
-            case NONE:
-                return 0xffffff;
-            case LOW:
-                return 0x00ff00;
-            case MODERATE:
-                return 0xffff00;
-            case CONSIDERABLE:
-                return 0xffff00;
-            case HIGH:
-                return 0xee1100;
-            case EXTREME:
-                return 0xcc0000;
-            default:
-                return 0xffffff;
+    /**
+     * Returns the RGB color representing the given hazard rating
+     */
+    public static int getColor(Rating rating) {
+        switch(rating) {
+            case NONE: return 0xffffff;
+            case LOW: return 0x00ff00;
+            case MODERATE: return 0xffff00;
+            case CONSIDERABLE: return 0xffff00;
+            case HIGH: return 0xee1100;
+            case EXTREME: return 0xcc0000;
+            default: return 0xffffff;
         }
     }
+
+    /**
+     * Returns the ARGB color representing the given hazard rating
+     */
+    public static int getForegroundColor(Rating rating) {
+        switch(rating) {
+            case NONE: return 0xffffffff;
+            case LOW: return 0xff88dd00;
+            case MODERATE: return 0xffffff00;
+            case CONSIDERABLE: return 0xffff9900;
+            case HIGH: return 0xffee0000;
+            case EXTREME: return 0xff000000;
+            default: return 0xffffffff;
+        }
+    }
+
+    /**
+     * Returns the ARGB color representing the given hazard rating
+     */
+    public static int getBackgroundColor(Rating rating) {
+        switch(rating) {
+            case EXTREME: return 0xffdd0000;
+            default: return 0x00000000;
+        }
+    }
+    
+    public static int getImage(Rating rating) {
+        switch(rating) {
+            case NONE: return R.drawable.danger0;
+            case LOW: return R.drawable.danger1;
+            case MODERATE: return R.drawable.danger2;
+            case CONSIDERABLE: return R.drawable.danger3;
+            case HIGH: return R.drawable.danger4;
+            case EXTREME: return R.drawable.danger5;
+            default: return R.drawable.danger0;
+        }
+    }
+
 }
