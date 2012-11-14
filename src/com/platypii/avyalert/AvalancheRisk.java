@@ -20,19 +20,12 @@ public class AvalancheRisk {
     
     public static Rating parseRating(String str) {
         Log.i("AvalancheRisk", "parsing: \"" + str + "\"");
-        if(str.matches("Extreme")) {
-            return Rating.EXTREME;
-        } else if(str.matches("High")) {
-            return Rating.HIGH;
-        } else if(str.matches("Considerable")) {
-            return Rating.CONSIDERABLE;
-        } else if(str.matches("Moderate")) {
-            return Rating.MODERATE;
-        } else if(str.matches("Low")) {
-            return Rating.LOW;
-        } else {
-            return Rating.NONE;
-        }
+        if(str.matches("Extreme")) return Rating.EXTREME;
+        else if(str.matches("High")) return Rating.HIGH;
+        else if(str.matches("Considerable")) return Rating.CONSIDERABLE;
+        else if(str.matches("Moderate")) return Rating.MODERATE;
+        else if(str.matches("Low")) return Rating.LOW;
+        else return Rating.NONE;
     }
     
     /**
@@ -56,7 +49,7 @@ public class AvalancheRisk {
     public static int getForegroundColor(Rating rating) {
         switch(rating) {
             case NONE: return 0xffffffff;
-            case LOW: return 0xff44cc44;
+            case LOW: return 0xff44bb44;
             case MODERATE: return 0xffffff00;
             case CONSIDERABLE: return 0xffff9900;
             case HIGH: return 0xffee0000;

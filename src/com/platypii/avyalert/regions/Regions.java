@@ -66,8 +66,7 @@ public class Regions {
 //      locationManager.requestSingleUpdate("GPS", new LocationListener() {
 //      @Override
 //      public void onLocationChanged(Location location) {
-//          // TODO Auto-generated method stub
-//          
+//          // TODO: Handle location update
 //      }
 //      @Override
 //      public void onProviderDisabled(String provider) {}

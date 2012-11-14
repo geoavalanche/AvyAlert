@@ -180,7 +180,8 @@ public class MainActivity extends Activity {
                 dateView.setText("Date: " + currentAdvisory.date);
                 dateView.setVisibility(View.VISIBLE);
             }
-            detailsView.setText(Html.fromHtml(currentAdvisory.details));
+            String html = removeImgs(currentAdvisory.details);
+            detailsView.setText(Html.fromHtml(html));
             detailsView.setVisibility(View.VISIBLE);
         } else {
             dangerLabel.setVisibility(View.GONE);
@@ -189,6 +190,24 @@ public class MainActivity extends Activity {
             detailsView.setText(null);
         }
     }
+
+    /**
+     * Removes img tags from a String
+     */
+    private String removeImgs(String details) {
+        StringBuffer buf = new StringBuffer();
+        details = details.replaceAll("<(img|IMG)", "<img"); // Handle img or IMG
+        int i = 0;
+        while(i != -1 && i < details.length()) {
+            int j = details.indexOf("<img", i + 1);
+            if(j == -1) j = details.length();
+            buf.append(details.substring(i, j));
+            i = details.indexOf(">", j);
+            if(i != -1) i++;
+        }
+        return buf.toString();
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

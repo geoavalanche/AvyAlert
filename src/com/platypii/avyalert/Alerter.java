@@ -1,5 +1,6 @@
 package com.platypii.avyalert;
 
+import java.util.Calendar;
 import com.platypii.avyalert.AvalancheRisk.Rating;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -42,6 +43,11 @@ public class Alerter {
             return;
         }
         
+        // Weekend only
+        if(prefs.getBoolean("weekend_only", false) && isWeekend()) {
+            return;
+        }
+        
         // Intent to open the advisory in AvyAlert
         PendingIntent openAdvisory = PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), 0);
 
@@ -65,6 +71,18 @@ public class Alerter {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         
         notificationManager.notify(ADVISORY_NOTI, noti);
+    }
+
+    /**
+     * Returns true Friday 16:00 -> Sunday 11:59
+     */
+    private static boolean isWeekend() {
+        Calendar cal = Calendar.getInstance();
+        int day = cal.get(Calendar.DAY_OF_WEEK);
+        int hour = cal.get(Calendar.HOUR_OF_DAY);
+        if(day == Calendar.SATURDAY || day == Calendar.SUNDAY) return true; // Saturday + Sunday
+        else if(day == Calendar.FRIDAY && hour >= 16) return true; // Friday after 4pm
+        else return false;
     }
     
 }

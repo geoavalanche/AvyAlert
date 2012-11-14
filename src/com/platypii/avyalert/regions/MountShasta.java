@@ -40,11 +40,11 @@ public class MountShasta implements Region {
         Rating rating = divRating == null? Rating.NONE : AvalancheRisk.parseRating(divRating.text()); // TODO: More robust selector
         
         // Parse details
-        String details = divAdvisory.text();
-        return new Advisory(date, rating, details, this);
+        String details = divAdvisory.html();
 
         // TODO: Download avalanche rose
         
+        return new Advisory(date, rating, details, this);
     }
 
     @Override
