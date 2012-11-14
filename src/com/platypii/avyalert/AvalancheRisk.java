@@ -3,6 +3,10 @@ package com.platypii.avyalert;
 import android.util.Log;
 
 
+/**
+ * This class contains general knowledge about avalanche risk
+ * @author platypii
+ */
 public class AvalancheRisk {
 
     public enum Rating {NONE, LOW, MODERATE, CONSIDERABLE, HIGH, EXTREME}
@@ -52,7 +56,7 @@ public class AvalancheRisk {
     public static int getForegroundColor(Rating rating) {
         switch(rating) {
             case NONE: return 0xffffffff;
-            case LOW: return 0xff88dd00;
+            case LOW: return 0xff44cc44;
             case MODERATE: return 0xffffff00;
             case CONSIDERABLE: return 0xffff9900;
             case HIGH: return 0xffee0000;

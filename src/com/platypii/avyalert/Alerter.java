@@ -48,9 +48,10 @@ public class Alerter {
         Builder builder = new NotificationCompat.Builder(context);
         builder.setContentTitle("Avalanche Risk: " + advisory.rating);
         builder.setTicker("Avalanche Risk: " + advisory.rating);
-        builder.setContentText(advisory.getDetails());
+        builder.setContentText(advisory.details);
         builder.setSmallIcon(AvalancheRisk.getImage(advisory.rating));
         builder.setAutoCancel(true);
+        builder.setVibrate(new long[] {0, 120, 60, 200});
         builder.setDefaults(Notification.FLAG_SHOW_LIGHTS);
         if(advisory.rating == Rating.EXTREME)
             builder.setLights(AvalancheRisk.getColor(advisory.rating), 80, 150); // On for 80ms, off for 150ms
@@ -58,10 +59,6 @@ public class Alerter {
             builder.setLights(AvalancheRisk.getColor(advisory.rating), 1200, 8000); // On for 1200ms, off for 8000ms
         builder.setContentIntent(openAdvisory);
         //builder.setLargeIcon(aBitmap);
-        
-        if(prefs.getBoolean("enable_vibrate", true)) {
-            builder.setVibrate(new long[] {0, 100, 50, 180});
-        }
 
         Notification noti = builder.build();
 

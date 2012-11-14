@@ -2,11 +2,14 @@ package com.platypii.avyalert;
 
 import java.io.IOException;
 import com.platypii.avyalert.R;
-import com.platypii.avyalert.AvalancheRisk.Rating;
+import com.platypii.avyalert.regions.Region;
+import com.platypii.avyalert.regions.Regions;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.view.Menu;
@@ -14,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 /**
@@ -21,15 +25,23 @@ import android.widget.TextView;
  * @author platypii
  */
 public class MainActivity extends Activity {
-    
-    Advisory latestAdvisory;
 
+    private static Region currentRegion; // The current region
+    private static Advisory currentAdvisory; // The advisory currently being displayed
+    
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        final Context appContext = getApplicationContext();
+        
+        // Load the latest advisory
+        updateAdvisory();
+
+    }
+
+    
+    private void updateAdvisory() {
         final ProgressBar loading = (ProgressBar) findViewById(R.id.loading);
         
         new AsyncTask<Void, Void, Advisory>() {
@@ -39,12 +51,15 @@ public class MainActivity extends Activity {
             }
             @Override
             protected Advisory doInBackground(Void... params) {
+                // Keep retrying
                 while(true) {
                     try {
-                        return new Advisory(appContext);
+                        currentRegion = Regions.getCurrentRegion(getApplicationContext());
+                        return currentRegion.getAdvisory();
                     } catch(IOException e) {
                         Log.w("MainActivity", "Failed to download advisory");
                     }
+                    // Sleep
                     try {
                         Thread.sleep(8000);
                     } catch(InterruptedException e) {}
@@ -52,14 +67,11 @@ public class MainActivity extends Activity {
             }
             @Override
             protected void onPostExecute(Advisory advisory) {
-                
-                advisory.rating = Rating.CONSIDERABLE; // TODO
-                
-                MainActivity.this.latestAdvisory = advisory;
-                updateText(advisory);
+                MainActivity.currentAdvisory = advisory;
+                updateViews(advisory);
                 loading.setVisibility(View.GONE);
                 
-                // Notification
+                // Notify user
                 Alerter.notifyUser(MainActivity.this, advisory);
             }
         }.execute();
@@ -69,13 +81,22 @@ public class MainActivity extends Activity {
     /**
      * Updates the text views with the given advisory
      */
-    private void updateText(Advisory advisory) {
+    @SuppressLint("NewApi")
+    private void updateViews(Advisory advisory) {
+        if(currentRegion != null) {
+            if(android.os.Build.VERSION_CODES.HONEYCOMB <= android.os.Build.VERSION.SDK_INT) {
+                ActionBar actionBar = getActionBar();
+                actionBar.setSubtitle(currentRegion.getName());
+            }
+        }
+        
         TextView ratingView = (TextView) findViewById(R.id.ratingView);
-        TextView detailsView = (TextView) findViewById(R.id.detailsView);
         ratingView.setText(advisory.rating.toString());
-        ratingView.setTextColor(0xff000000 + AvalancheRisk.getForegroundColor(advisory.rating));
+        ratingView.setTextColor(AvalancheRisk.getForegroundColor(advisory.rating));
         ratingView.setBackgroundColor(AvalancheRisk.getBackgroundColor(advisory.rating));
-        detailsView.setText(advisory.getDetails());
+
+        TextView detailsView = (TextView) findViewById(R.id.detailsView);
+        detailsView.setText(advisory.details);
     }
 
     @Override
@@ -86,7 +107,16 @@ public class MainActivity extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.menu_advisory:
+                // Open url
+                if(currentRegion != null) {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(currentRegion.getAdvisoryUrl()));
+                    startActivity(browserIntent);
+                } else {
+                    Toast.makeText(this, "Cannot determine your location. Please select a region in settings.", Toast.LENGTH_SHORT);
+                }
             case R.id.menu_settings:
+                // Open settings
                 startActivity(new Intent(this, SettingsActivity.class));
                 return true;
             default:

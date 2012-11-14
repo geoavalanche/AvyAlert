@@ -2,7 +2,7 @@
 
     <string name="app_name">AvyAlert</string>
     <string name="loading">Loading...</string>
+    <string name="menu_advisory">Advisory</string>
     <string name="menu_settings">Settings</string>
-    <string name="title_activity_main">AvyAlert Eastern Sierra</string>
 
 </resources>
