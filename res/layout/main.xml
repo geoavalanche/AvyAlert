@@ -8,7 +8,8 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_gravity="center"
-		android:indeterminate="true" />
+		android:indeterminate="true"
+		android:visibility="gone" />
    	
    	<ScrollView 
 		android:layout_width="match_parent"
@@ -27,14 +28,26 @@
 		        android:layout_alignParentTop="true" />
 		    
 			<TextView
-		        android:id="@+id/ratingView"
-		        style="@android:style/TextAppearance.Medium"
-		        android:layout_width="match_parent"
+		        android:id="@+id/dangerLabel"
+		        style="@android:style/TextAppearance.Large"
+		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
-		        android:gravity="center"
 		        android:padding="2dp"
 		        android:text=""
-		        android:textSize="18pt"
+		        android:textSize="15pt"
+		        android:layout_alignParentLeft="true"
+		        android:layout_below="@+id/regionView" />
+		
+			<TextView
+		        android:id="@+id/ratingView"
+		        style="@android:style/TextAppearance.Large"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:padding="2dp"
+		        android:text=""
+		        android:textSize="15pt"
+		        android:layout_alignParentRight="true"
+		        android:layout_toRightOf="@+id/hazardLabel"
 		        android:layout_below="@+id/regionView" />
 		
 		    <TextView

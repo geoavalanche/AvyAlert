@@ -2,6 +2,7 @@ package com.platypii.avyalert;
 
 import java.io.IOException;
 import com.platypii.avyalert.R;
+import com.platypii.avyalert.AvalancheRisk.Rating;
 import com.platypii.avyalert.regions.Region;
 import com.platypii.avyalert.regions.Regions;
 import android.net.Uri;
@@ -72,11 +73,42 @@ public class MainActivity extends Activity {
                 ActionBar actionBar = getActionBar();
                 actionBar.setSubtitle(currentRegion.getName());
             }
-            regionView.setImageResource(R.drawable.easternsierra);
+            regionView.setImageResource(currentRegion.getBanner());
             regionView.setContentDescription(currentRegion.getName());
+            regionView.setVisibility(View.VISIBLE);
         } else {
             regionView.setVisibility(View.GONE);
         }
+    }
+
+    /**
+     * Prompt the user to choose their region
+     */
+    private void showRegionDialog() {
+        final CharSequence[] regions = Regions.getRegionNames();
+        int index = currentRegion == null? -1 : Regions.indexOf(currentRegion.getName());
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Avalanche Region");
+        builder.setItems(regions, null);
+        builder.setSingleChoiceItems(regions, index, new OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                CharSequence regionName = regions[which];
+                // Store to preferences
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                SharedPreferences.Editor prefsEditor = prefs.edit();
+                prefsEditor.putString("region", regionName.toString());
+                prefsEditor.commit();
+                // Update
+                currentRegion = Regions.getRegion(regionName);
+                currentAdvisory = null;
+                updateRegion();
+                updateAdvisoryViews();
+                updateAdvisory();
+                dialog.dismiss();
+            }
+        });
+        builder.show();
     }
 
     /**
@@ -125,47 +157,37 @@ public class MainActivity extends Activity {
      * Updates the text views for the current advisory
      */
     private void updateAdvisoryViews() {
-        
+        TextView dangerLabel = (TextView) findViewById(R.id.dangerLabel);
         TextView ratingView = (TextView) findViewById(R.id.ratingView);
         TextView dateView = (TextView) findViewById(R.id.dateView);
         TextView detailsView = (TextView) findViewById(R.id.detailsView);
         
-        ratingView.setText(currentAdvisory.rating.toString());
-        ratingView.setTextColor(AvalancheRisk.getForegroundColor(currentAdvisory.rating));
-        ratingView.setBackgroundColor(AvalancheRisk.getBackgroundColor(currentAdvisory.rating));
-
-
-        dateView.setText("Date: " + currentAdvisory.date);
-
-        detailsView.setText(Html.fromHtml(currentAdvisory.details));
-    }
-
-    /**
-     * Prompt the user to choose their region
-     */
-    private void showRegionDialog() {
-        final CharSequence[] regions = Regions.getRegionNames();
-        int index = currentRegion == null? 0 : Regions.indexOf(currentRegion.getName());
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Avalanche Region");
-        builder.setItems(regions, null);
-        builder.setSingleChoiceItems(regions, index, new OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                CharSequence regionName = regions[which];
-                currentRegion = Regions.getRegion(regionName);
-                // Store to preferences
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                SharedPreferences.Editor prefsEditor = prefs.edit();
-                prefsEditor.putString("region", regionName.toString());
-                prefsEditor.commit();
-                // Update
-                updateRegion();
-                updateAdvisory();
-                dialog.dismiss();
+        if(currentAdvisory != null) {
+            ratingView.setBackgroundColor(AvalancheRisk.getBackgroundColor(currentAdvisory.rating));
+            if(currentAdvisory.rating != Rating.NONE) {
+                dangerLabel.setText("Danger: ");
+                ratingView.setText(currentAdvisory.rating.toString());
+                ratingView.setTextColor(AvalancheRisk.getForegroundColor(currentAdvisory.rating));
+                dangerLabel.setVisibility(View.VISIBLE);
+                ratingView.setVisibility(View.VISIBLE);
+            } else {
+                dangerLabel.setVisibility(View.GONE);
+                ratingView.setVisibility(View.GONE);
             }
-        });
-        builder.show();
+            if(currentAdvisory.date == null || currentAdvisory.date.equals("")) {
+                dateView.setVisibility(View.GONE);
+            } else {
+                dateView.setText("Date: " + currentAdvisory.date);
+                dateView.setVisibility(View.VISIBLE);
+            }
+            detailsView.setText(Html.fromHtml(currentAdvisory.details));
+            detailsView.setVisibility(View.VISIBLE);
+        } else {
+            dangerLabel.setVisibility(View.GONE);
+            ratingView.setVisibility(View.GONE);
+            dateView.setVisibility(View.GONE);
+            detailsView.setText(null);
+        }
     }
 
     @Override
@@ -185,7 +207,7 @@ public class MainActivity extends Activity {
                     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(currentRegion.getAdvisoryUrl()));
                     startActivity(browserIntent);
                 } else {
-                    Toast.makeText(this, "Cannot determine your location. Please select a region in settings.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Please select an avalanche region first", Toast.LENGTH_SHORT).show();
                 }
                 return true;
             case R.id.menu_settings:

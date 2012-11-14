@@ -11,9 +11,10 @@ public class Regions {
 
     public static List<Region> regions = new ArrayList<Region>();
     static {
-        regions.add(new TestRegion());
         regions.add(new EasternSierra());
         regions.add(new LakeTahoe());
+        regions.add(new MountShasta());
+        regions.add(new LosAngeles());
     }
     
 

@@ -9,11 +9,12 @@ import android.location.Location;
 import android.util.Log;
 import com.platypii.avyalert.Advisory;
 import com.platypii.avyalert.AvalancheRisk;
+import com.platypii.avyalert.R;
 import com.platypii.avyalert.AvalancheRisk.Rating;
 
 
 /**
- * Represents a Sierra Avalanche Advisory. Pulls from http.
+ * Represents the Sierra Avalanche Center. Pulls from http.
  * @author platypii
  */
 public class LakeTahoe implements Region {
@@ -64,6 +65,11 @@ public class LakeTahoe implements Region {
     @Override
     public String getAdvisoryUrl() {
         return url;
+    }
+
+    @Override
+    public int getBanner() {
+        return R.drawable.tahoe;
     }
 
 }

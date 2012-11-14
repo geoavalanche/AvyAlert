@@ -3,17 +3,18 @@ package com.platypii.avyalert.regions;
 import java.util.Date;
 import android.location.Location;
 import com.platypii.avyalert.Advisory;
+import com.platypii.avyalert.R;
 import com.platypii.avyalert.AvalancheRisk.Rating;
 
 
 /**
- * Represents an ESAC Advisory. Pulls from http.
+ * Represents an Avalanche Region. Pulls from http.
  * @author platypii
  */
-public class TestRegion implements Region {
-    private static final String region = "Test Region";
+public class LosAngeles implements Region {
+    private static final String region = "Los Angeles";
     
-    private Rating rating = Rating.HIGH;
+    private Rating rating = Rating.LOW;
     private String details = "Details...";
     
 
@@ -39,6 +40,11 @@ public class TestRegion implements Region {
     @Override
     public String getAdvisoryUrl() {
         return "http://www.google.com/";
+    }
+
+    @Override
+    public int getBanner() {
+        return R.drawable.la;
     }
 
 }

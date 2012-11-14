@@ -13,6 +13,11 @@ public interface Region {
     public String getName();
 
     /**
+     * Returns the region banner resource ID
+     */
+    public int getBanner();
+
+    /**
      * Returns the region location
      */
     public Location getLocation();

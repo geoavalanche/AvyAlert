@@ -10,13 +10,14 @@ import android.util.Log;
 import com.platypii.avyalert.Advisory;
 import com.platypii.avyalert.AvalancheRisk;
 import com.platypii.avyalert.AvalancheRisk.Rating;
+import com.platypii.avyalert.R;
 
 
 /**
  * Represents an Avalanche Advisory. Pulls from http.
  * @author platypii
  */
-public class Shasta implements Region {
+public class MountShasta implements Region {
     private static final String region = "Mount Shasta";
     private static final String url = "http://shastaavalanche.org/advisories/advisories/avalanche-advisory";
     
@@ -29,11 +30,10 @@ public class Shasta implements Region {
         Log.i("ESAC", "Connecting to " + url);
 
         Document doc = Jsoup.connect(url).get();
-        Elements divAdvisory = doc.select("div.forecast-advisory");
+        Elements divAdvisory = doc.select("table.contentpaneopen");
         
-        // Parse date
-        Element dateElement = divAdvisory.select("strong").first();
-        String date = dateElement == null? "" : dateElement.text();
+        // TODO: Parse date
+        String date = "";
         
         // Parse rating
         Element divRating = divAdvisory.select(".rating div").first();
@@ -54,16 +54,21 @@ public class Shasta implements Region {
 
     @Override
     public Location getLocation() {
-        // Lake Tahoe
+        // Mt Shasta
         Location loc = new Location("");
-        loc.setLatitude(39.091667);
-        loc.setLongitude(-120.041667);
+        loc.setLatitude(41.409196);
+        loc.setLongitude(-122.194888);
         return loc;
     }
 
     @Override
     public String getAdvisoryUrl() {
         return url;
+    }
+
+    @Override
+    public int getBanner() {
+        return R.drawable.shasta;
     }
 
 }

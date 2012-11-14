@@ -10,10 +10,11 @@ import android.util.Log;
 import com.platypii.avyalert.Advisory;
 import com.platypii.avyalert.AvalancheRisk;
 import com.platypii.avyalert.AvalancheRisk.Rating;
+import com.platypii.avyalert.R;
 
 
 /**
- * Represents an ESAC Advisory. Pulls from http.
+ * Represents the Eastern Sierra Avalanche Center. Pulls from http.
  * @author platypii
  */
 public class EasternSierra implements Region {
@@ -66,6 +67,11 @@ public class EasternSierra implements Region {
     @Override
     public String getAdvisoryUrl() {
         return url;
+    }
+
+    @Override
+    public int getBanner() {
+        return R.drawable.easternsierra;
     }
 
 }

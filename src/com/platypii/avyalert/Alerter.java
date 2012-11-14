@@ -51,7 +51,7 @@ public class Alerter {
         builder.setContentText(advisory.details);
         builder.setSmallIcon(AvalancheRisk.getImage(advisory.rating));
         builder.setAutoCancel(true);
-        builder.setVibrate(new long[] {0, 120, 60, 200});
+        // builder.setVibrate(new long[] {0, 140, 70, 220});
         builder.setDefaults(Notification.FLAG_SHOW_LIGHTS);
         if(advisory.rating == Rating.EXTREME)
             builder.setLights(AvalancheRisk.getColor(advisory.rating), 80, 150); // On for 80ms, off for 150ms
