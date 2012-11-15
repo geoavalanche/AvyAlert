@@ -36,10 +36,13 @@ public class MainActivity extends Activity {
     private static Advisory currentAdvisory; // The advisory currently being displayed
 
     // Views
+    private ProgressBar loading;
     private ImageView regionView;
     private View advisoryView;
     private View linkView;
     private TextView centerLabel;
+    
+    SharedPreferences prefs;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,6 +50,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.main);
 
         // Find views
+        loading = (ProgressBar) findViewById(R.id.loading);
         regionView = (ImageView) findViewById(R.id.regionView);
         advisoryView = findViewById(R.id.advisoryView);
         linkView = findViewById(R.id.linkView);
@@ -57,30 +61,24 @@ public class MainActivity extends Activity {
         linkView.setOnClickListener(linkListener);
         
         // Load region from preferences
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String regionName = prefs.getString("region", null);
-        
         if(regionName != null) {
-            currentRegion = Regions.getRegion(regionName);
+            setRegion(regionName);
         } else {
             showRegionDialog();
         }
 
-        // Set the region
-        updateRegion();
-        
-        // Load the latest advisory
-        fetchAdvisory();
-
     }
 
-    
     /**
-     * Updates the region banner for the current region
+     * Sets the current region to the given region, and fetches a new advisory
      */
     @SuppressLint("NewApi")
-    private void updateRegion() {
+    private void setRegion(CharSequence regionName) {
+        currentRegion = Regions.getRegion(regionName);
         if(currentRegion != null) {
+            // Update view
             if(android.os.Build.VERSION_CODES.HONEYCOMB <= android.os.Build.VERSION.SDK_INT) {
                 ActionBar actionBar = getActionBar();
                 actionBar.setSubtitle(currentRegion.getName());
@@ -88,7 +86,10 @@ public class MainActivity extends Activity {
             regionView.setImageResource(currentRegion.getBanner());
             regionView.setContentDescription(currentRegion.getName());
             regionView.setVisibility(View.VISIBLE);
-            centerLabel.setText(currentRegion.getCenterName());
+            centerLabel.setText("from " + currentRegion.getCenterName());
+            
+            // Update Advisory
+            fetchAdvisory();
         } else {
             regionView.setVisibility(View.GONE);
             linkView.setVisibility(View.GONE);
@@ -109,16 +110,11 @@ public class MainActivity extends Activity {
             public void onClick(DialogInterface dialog, int which) {
                 CharSequence regionName = regions[which];
                 // Store to preferences
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 SharedPreferences.Editor prefsEditor = prefs.edit();
                 prefsEditor.putString("region", regionName.toString());
                 prefsEditor.commit();
                 // Update
-                currentRegion = Regions.getRegion(regionName);
-                currentAdvisory = null;
-                updateRegion();
-                updateAdvisory();
-                fetchAdvisory();
+                setRegion(regionName);
                 dialog.dismiss();
             }
         });
@@ -130,7 +126,6 @@ public class MainActivity extends Activity {
      */
     private void fetchAdvisory() {
         if(currentRegion != null) {
-            final ProgressBar loading = (ProgressBar) findViewById(R.id.loading);
             new AsyncTask<Void, Void, Advisory>() {
                 @Override
                 protected void onPreExecute() {
@@ -138,24 +133,16 @@ public class MainActivity extends Activity {
                 }
                 @Override
                 protected Advisory doInBackground(Void... params) {
-                    // Keep retrying
-                    while(true) {
-                        try {
-                            currentRegion = Regions.getCurrentRegion(getApplicationContext());
-                            return currentRegion.getAdvisory();
-                        } catch(IOException e) {
-                            Log.w("MainActivity", "Failed to download advisory");
-                        }
-                        // Sleep
-                        try {
-                            Thread.sleep(8000);
-                        } catch(InterruptedException e) {}
+                    try {
+                        return currentRegion.getAdvisory();
+                    } catch(IOException e) {
+                        Log.w("MainActivity", "Failed to download advisory");
+                        return null;
                     }
                 }
                 @Override
                 protected void onPostExecute(Advisory advisory) {
-                    MainActivity.currentAdvisory = advisory;
-                    updateAdvisory();
+                    setAdvisory(advisory);
                     loading.setVisibility(View.GONE);
                     
                     // Notify user
@@ -170,7 +157,8 @@ public class MainActivity extends Activity {
     /**
      * Updates the text views for the current advisory
      */
-    private void updateAdvisory() {
+    private void setAdvisory(Advisory advisory) {
+        currentAdvisory = advisory;
         TextView dangerLabel = (TextView) findViewById(R.id.dangerLabel);
         TextView ratingLabel = (TextView) findViewById(R.id.ratingLabel);
         TextView dateLabel = (TextView) findViewById(R.id.dateLabel);
@@ -207,11 +195,12 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * Removes img tags from a String
+     * Removes img tags, anchor tags, etc
      */
-    private String cleanHtml(String details) {
+    private static String cleanHtml(String details) {
         StringBuffer buf = new StringBuffer();
         details = details.replaceAll("<(img|IMG)", "<img"); // Handle img or IMG
+        details = details.replaceAll("</?[aA].*>", ""); // Handle img or IMG
         int i = 0;
         while(i != -1 && i < details.length()) {
             int j = details.indexOf("<img", i + 1);

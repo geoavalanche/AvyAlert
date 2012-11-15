@@ -2,9 +2,6 @@ package com.platypii.avyalert.regions;
 
 import java.util.ArrayList;
 import java.util.List;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
 
 public class Regions {
@@ -18,25 +15,6 @@ public class Regions {
     }
     
 
-    public static Region getCurrentRegion(Context context) {
-        
-        // Preferences
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String regionName = prefs.getString("region", null);
-     
-        // Auto location
-        if(regionName.equals("Auto")) {
-//            autoRegion(context);
-        } else {
-            // Return selected region
-            for(Region region : regions)
-                if(region.getName().equals(regionName))
-                    return region;
-        }
-        return null;
-
-    }
-    
 //    private static Region autoRegion(Context context) {
 //        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 //
