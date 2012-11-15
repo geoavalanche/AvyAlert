@@ -54,8 +54,8 @@
 		            android:layout_marginBottom="4dp"
 		            android:layout_alignParentRight="true"
 		            android:layout_alignParentTop="true"
-		            android:paddingRight="3dp"
-		            android:paddingLeft="3dp"
+		            android:paddingRight="4dp"
+		            android:paddingLeft="4dp"
 		            android:textSize="15pt"
 		            android:text="" />
 
@@ -84,6 +84,7 @@
 				android:layout_height="wrap_content"
 				android:layout_marginTop="8dp"
 				android:layout_marginBottom="2dp"
+				android:padding="3dp"
 				android:orientation="vertical"
 				android:visibility="gone" >
 					    
