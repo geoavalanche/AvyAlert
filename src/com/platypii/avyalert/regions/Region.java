@@ -13,6 +13,11 @@ public interface Region {
     public String getName();
 
     /**
+     * Returns the avalanche center responsible for advisories (eg- "Eastern Sierra Avalanche Center")
+     */
+    public String getCenterName();
+
+    /**
      * Returns the region banner resource ID
      */
     public int getBanner();

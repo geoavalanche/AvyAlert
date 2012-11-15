@@ -12,9 +12,8 @@ import com.platypii.avyalert.AvalancheRisk.Rating;
  * @author platypii
  */
 public class LosAngeles implements Region {
-    private static final String region = "Los Angeles";
-    
-    private Rating rating = Rating.LOW;
+
+    private Rating rating = Rating.EXTREME;
     private String details = "Details...";
     
 
@@ -25,8 +24,14 @@ public class LosAngeles implements Region {
 
     @Override
     public String getName() {
-        return region;
+        return "Los Angeles";
     }
+    
+    @Override
+    public String getCenterName() {
+        return "Fake Avalanche Center";
+    }
+
 
     @Override
     public Location getLocation() {

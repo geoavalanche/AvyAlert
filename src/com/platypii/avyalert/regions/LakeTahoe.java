@@ -18,18 +18,15 @@ import com.platypii.avyalert.AvalancheRisk.Rating;
  * @author platypii
  */
 public class LakeTahoe implements Region {
-    private static final String region = "Lake Tahoe";
-    private static final String url = "http://www.sierraavalanchecenter.org/advisory";
-    
     
     /**
      * Load the latest ESAC Advisory
      */
     @Override
     public Advisory getAdvisory() throws IOException {
-        Log.i("ESAC", "Connecting to " + url);
+        Log.i("ESAC", "Connecting to " + getAdvisoryUrl());
 
-        Document doc = Jsoup.connect(url).get();
+        Document doc = Jsoup.connect(getAdvisoryUrl()).get();
         Elements divAdvisory = doc.select("div.content table");
         
         // Parse date
@@ -51,7 +48,12 @@ public class LakeTahoe implements Region {
 
     @Override
     public String getName() {
-        return region;
+        return "Lake Tahoe";
+    }
+    
+    @Override
+    public String getCenterName() {
+        return "Sierra Avalanche Center";
     }
 
     @Override
@@ -65,7 +67,7 @@ public class LakeTahoe implements Region {
 
     @Override
     public String getAdvisoryUrl() {
-        return url;
+        return "http://www.sierraavalanchecenter.org/advisory";
     }
 
     @Override

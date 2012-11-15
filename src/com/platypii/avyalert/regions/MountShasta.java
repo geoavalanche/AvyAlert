@@ -18,18 +18,15 @@ import com.platypii.avyalert.R;
  * @author platypii
  */
 public class MountShasta implements Region {
-    private static final String region = "Mount Shasta";
-    private static final String url = "http://shastaavalanche.org/advisories/advisories/avalanche-advisory";
-    
-    
+
     /**
      * Load the latest ESAC Advisory
      */
     @Override
     public Advisory getAdvisory() throws IOException {
-        Log.i("ESAC", "Connecting to " + url);
+        Log.i("ESAC", "Connecting to " + getAdvisoryUrl());
 
-        Document doc = Jsoup.connect(url).get();
+        Document doc = Jsoup.connect(getAdvisoryUrl()).get();
         Elements divAdvisory = doc.select("table.contentpaneopen");
         
         // TODO: Parse date
@@ -49,7 +46,11 @@ public class MountShasta implements Region {
 
     @Override
     public String getName() {
-        return region;
+        return "Mount Shasta";
+    }
+    @Override
+    public String getCenterName() {
+        return "Mount Shasta Avalanche Center";
     }
 
     @Override
@@ -63,7 +64,7 @@ public class MountShasta implements Region {
 
     @Override
     public String getAdvisoryUrl() {
-        return url;
+        return "http://shastaavalanche.org/advisories/advisories/avalanche-advisory";
     }
 
     @Override

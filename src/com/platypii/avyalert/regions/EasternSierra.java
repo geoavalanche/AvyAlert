@@ -18,20 +18,15 @@ import com.platypii.avyalert.R;
  * @author platypii
  */
 public class EasternSierra implements Region {
-    private static final String region = "Eastern Sierra";
-    
-    private static final String url = "http://esavalanche.org/advisory";
-    // private static final String url = "http://platypiiindustries.com/esac/advisory";
-    
     
     /**
      * Load the latest ESAC Advisory
      */
     @Override
     public Advisory getAdvisory() throws IOException {
-        Log.i("ESAC", "Connecting to " + url);
+        Log.i("ESAC", "Connecting to " + getAdvisoryUrl());
 
-        Document doc = Jsoup.connect(url).get();
+        Document doc = Jsoup.connect(getAdvisoryUrl()).get();
         Elements divAdvisory = doc.select("div.forecast-advisory");
 
         // Parse date
@@ -52,7 +47,12 @@ public class EasternSierra implements Region {
 
     @Override
     public String getName() {
-        return region;
+        return "Eastern Sierra";
+    }
+
+    @Override
+    public String getCenterName() {
+        return "Eastern Sierra Avalanche Center";
     }
 
     @Override
@@ -66,7 +66,7 @@ public class EasternSierra implements Region {
 
     @Override
     public String getAdvisoryUrl() {
-        return url;
+        return "http://esavalanche.org/advisory";
     }
 
     @Override

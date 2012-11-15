@@ -13,68 +13,96 @@
    	
    	<ScrollView 
 		android:layout_width="match_parent"
-		android:layout_height="match_parent" >
+		android:layout_height="match_parent"
+		android:fillViewport="true" >
 
-		<RelativeLayout
+		<LinearLayout
 		    android:layout_width="match_parent"
-		    android:layout_height="wrap_content" >
+		    android:layout_height="wrap_content"
+		    android:orientation="vertical" >
 	
 		    <ImageView
 		        android:id="@+id/regionView"
 		        android:layout_width="match_parent"
 		        android:layout_height="wrap_content"
 		        android:adjustViewBounds="true"
-		        android:padding="0dp"
-		        android:layout_alignParentTop="true" />
+		        android:contentDescription="Avalanche Region"
+		        android:padding="0dp" />
 		    
-			<TextView
-		        android:id="@+id/dangerLabel"
-		        style="@android:style/TextAppearance.Large"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:padding="2dp"
-		        android:text=""
-		        android:textSize="15pt"
-		        android:layout_alignParentLeft="true"
-		        android:layout_below="@+id/regionView" />
+			<RelativeLayout
+		        android:id="@+id/advisoryView"
+			    android:layout_width="match_parent"
+			    android:layout_height="wrap_content"
+			    android:layout_weight="1"
+			    android:visibility="gone" >
+
+				<TextView
+		            android:id="@+id/dangerLabel"
+		            style="@android:style/TextAppearance.Large"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_alignParentLeft="true"
+		            android:layout_alignParentTop="true"
+		            android:textSize="15pt"
+		            android:text="Danger: " />
 		
-			<TextView
-		        android:id="@+id/ratingView"
-		        style="@android:style/TextAppearance.Large"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:padding="2dp"
-		        android:text=""
-		        android:textSize="15pt"
-		        android:layout_alignParentRight="true"
-		        android:layout_toRightOf="@+id/hazardLabel"
-		        android:layout_below="@+id/regionView" />
-		
-		    <TextView
-		        android:id="@+id/dateView"
-		        android:layout_width="match_parent"
-		        android:layout_height="wrap_content"
-		        android:padding="2dp"
-		        android:text=""
-		        android:layout_below="@+id/ratingView" />
-		    
-			<TextView
-		        android:id="@+id/detailsView"
-		        android:layout_width="match_parent"
-		        android:layout_height="wrap_content"
-		        android:padding="2dp"
-		        android:text=""
-		        android:layout_below="@+id/dateView" />
-		    
-	   	    <TextView 
-		        android:id="@+id/advisoryCenterLink"
-		        android:layout_width="match_parent"
-		        android:layout_height="wrap_content"
-		        android:padding="2dp"
-		        android:layout_below="@+id/detailsView"
-		        android:text="" />
-		    	
-		</RelativeLayout>
+		        <TextView
+		            android:id="@+id/ratingLabel"
+		            style="@android:style/TextAppearance.Large"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_marginBottom="4dp"
+		            android:layout_alignParentRight="true"
+		            android:layout_alignParentTop="true"
+		            android:paddingRight="3dp"
+		            android:paddingLeft="3dp"
+		            android:textSize="15pt"
+		            android:text="" />
+
+			    <TextView
+			        android:id="@+id/dateLabel"
+			        android:layout_width="match_parent"
+			        android:layout_height="wrap_content"
+			        android:padding="2dp"
+			        android:text=""
+			        android:layout_below="@+id/ratingLabel" />
+			    
+				<TextView
+			        android:id="@+id/detailsLabel"
+			        android:layout_width="match_parent"
+			        android:layout_height="wrap_content"
+			        android:padding="2dp"
+			        android:text=""
+			        android:layout_below="@+id/dateLabel" />
+				
+			</RelativeLayout>
+	   	    
+			<LinearLayout
+				android:id="@+id/linkView"
+				android:background="@drawable/link"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="8dp"
+				android:layout_marginBottom="2dp"
+				android:orientation="vertical"
+				android:visibility="gone" >
+					    
+				<TextView
+					android:id="@+id/linkLabel"
+					style="@android:style/TextAppearance.Large"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:text="View Full Advisory" />
+				
+				<TextView
+					android:id="@+id/centerLabel"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:text="" />
+			
+			</LinearLayout>
+
+		</LinearLayout>
 		
 	</ScrollView>
 	
