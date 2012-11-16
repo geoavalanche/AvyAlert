@@ -6,13 +6,13 @@
 		android:key="alert_options" >
 
         <CheckBoxPreference
-            android:key="enable_push"
+            android:key="enablePush"
             android:title="Push Notifications"
             android:summary="Receive an alert when there is a new advisory"
             android:defaultValue="false" />
 
 		<ListPreference
-			android:key="region"
+			android:key="currentRegion"
 			android:title="Avalanche Region"
 			android:summary="Select your local avalanche center"
 			android:enabled="false" />
@@ -25,31 +25,31 @@
 				android:title="Avalanche Danger Level" >
 		
 		        <CheckBoxPreference
-		            android:key="enable_low"
+		            android:key="alertLow"
 		            android:summary="Alert when danger is LOW"
 		            android:title="Low"
 		            android:defaultValue="true" />
 		
 		        <CheckBoxPreference
-		            android:key="enable_moderate"
+		            android:key="alertModerate"
 		            android:summary="Alert when danger is MODERATE"
 		            android:title="Moderate"
 		            android:defaultValue="true" />
 		
 		        <CheckBoxPreference
-		            android:key="enable_considerable"
+		            android:key="alertConsiderable"
 		            android:summary="Alert when danger is CONSIDERABLE"
 		            android:title="Considerable"
 		            android:defaultValue="true" />
 		
 				<CheckBoxPreference
-		            android:key="enable_high"
+		            android:key="alertHigh"
 		            android:summary="Alert when danger is HIGH"
 		            android:title="High"
 		            android:defaultValue="true" />
 		
 				<CheckBoxPreference
-		            android:key="enable_extreme"
+		            android:key="alertExtreme"
 		            android:summary="Alert when danger is EXTREME"
 		            android:title="Extreme"
 		            android:defaultValue="true" />
@@ -59,7 +59,7 @@
 	    </PreferenceScreen>
 
 		<CheckBoxPreference
-            android:key="weekend_only"
+            android:key="alertWeekendOnly"
             android:summary="Receive alerts only on weekends"
             android:title="Weekend Only"
             android:defaultValue="false" />

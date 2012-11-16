@@ -22,31 +22,32 @@ public class Alerter {
      * Notify the user of advisory
      */
     public static void notifyUser(Context context, Advisory advisory) {
-        Log.i("Alerter", "Notifying user");
+        if(advisory == null) return;
 
         // Preferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         // Control whether we notify or not
         if(advisory.rating == Rating.NONE) {
-            Log.i("Alerter", "Rating unknown, skipping notification");
+            Log.i("Alerter", "No rating, skipping notification");
             return;
-        } else if(advisory.rating == Rating.LOW && !prefs.getBoolean("enable_low", true)) {
+        } else if(advisory.rating == Rating.LOW && !prefs.getBoolean("alertLow", true)) {
             return;
-        } else if(advisory.rating == Rating.MODERATE && !prefs.getBoolean("enable_moderate", true)) {
+        } else if(advisory.rating == Rating.MODERATE && !prefs.getBoolean("alertModerate", true)) {
             return;
-        } else if(advisory.rating == Rating.CONSIDERABLE && !prefs.getBoolean("enable_considerable", true)) {
+        } else if(advisory.rating == Rating.CONSIDERABLE && !prefs.getBoolean("alertConsiderable", true)) {
             return;
-        } else if(advisory.rating == Rating.HIGH && !prefs.getBoolean("enable_high", true)) {
+        } else if(advisory.rating == Rating.HIGH && !prefs.getBoolean("alertHigh", true)) {
             return;
-        } else if(advisory.rating == Rating.EXTREME && !prefs.getBoolean("enable_extreme", true)) {
+        } else if(advisory.rating == Rating.EXTREME && !prefs.getBoolean("alertExtreme", true)) {
+            return;
+        }
+        // Weekend only
+        if(prefs.getBoolean("alertWeekendOnly", false) && isWeekend()) {
             return;
         }
         
-        // Weekend only
-        if(prefs.getBoolean("weekend_only", false) && isWeekend()) {
-            return;
-        }
+        Log.i("Alerter", "Notifying user");
         
         // Intent to open the advisory in AvyAlert
         PendingIntent openAdvisory = PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), 0);

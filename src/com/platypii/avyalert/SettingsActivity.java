@@ -1,7 +1,6 @@
 package com.platypii.avyalert;
 
 import com.platypii.avyalert.R;
-import com.platypii.avyalert.regions.Regions;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -16,7 +15,7 @@ public class SettingsActivity extends PreferenceActivity {
         super.onCreate(savedInstanceState);       
         addPreferencesFromResource(R.xml.preferences);
         
-        Preference pushPref = findPreference("enable_push");
+        Preference pushPref = findPreference("enablePush");
         pushPref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -26,8 +25,8 @@ public class SettingsActivity extends PreferenceActivity {
             }
         });
         
-        ListPreference regionPref = (ListPreference) findPreference("region");
-        CharSequence regions[] = Regions.getRegionNames();
+        ListPreference regionPref = (ListPreference) findPreference("currentRegion");
+        CharSequence regions[] = MainActivity.regions.getRegionNames();
         regionPref.setEntries(regions);
         regionPref.setEntryValues(regions);
         regionPref.setDefaultValue(regions[0]);

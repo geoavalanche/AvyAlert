@@ -1,99 +1,143 @@
 package com.platypii.avyalert.regions;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
+import com.platypii.avyalert.Callback;
+import com.platypii.avyalert.R;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.preference.PreferenceManager;
+import android.util.Log;
 
 
 public class Regions {
+    
+    // URL to get updates to region definitions
+    private static final String regionDataUrl = "http://platypiiindustries.com/AvyAlert/regions";
+    
+    private String regionData;
 
-    public static List<Region> regions = new ArrayList<Region>();
-    static {
-        regions.add(new EasternSierra());
-        regions.add(new LakeTahoe());
-        regions.add(new MountShasta());
-        regions.add(new LosAngeles());
+    public List<Region> regions = new ArrayList<Region>();
+
+    
+    public Regions(Context context) {
+        // Load region data from preferences
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        regionData = prefs.getString("regionData", null);
+        
+        if(regionData == null) {
+            // Load default region data from package
+            regionData = context.getString(R.string.default_region_data);
+        }
+        
+        // Parse region data
+        parseRegionData();
+    }
+
+    /**
+     * Parse region data from a JSON string
+     * @param regionData a JSON string representing the region data
+     */
+    private void parseRegionData() {
+        if(regionData != null) {
+            try {
+                regions = new Gson().fromJson(regionData, new TypeToken<List<Region>>(){}.getType());
+            } catch(JsonSyntaxException e) {
+                Log.w("Regions", "Failed to parse region data");
+                e.printStackTrace();
+            }
+        }
     }
     
-
-//    private static Region autoRegion(Context context) {
-//        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-//
-//        // Find Last Known Location
-//        private static Location lastLocation = null;
-//        Location lastGPSLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-//        Location lastNetworkLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-//        if(lastGPSLocation == null && lastNetworkLocation == null)
-//            lastLocation = null;
-//        else if(lastGPSLocation == null)
-//            lastLocation = lastNetworkLocation;
-//        else
-//            lastLocation = lastGPSLocation;
-//
-//        // Request fresh location
-//        requestLocation();
-//        
-//        // Find closest region
-//        return findClosestRegion(lastLocation);
-//
-//    }
-
     /**
-     * Requests a location update
+     * Fetches new region data from the internet
+     * @param callback callback to notify of new region data
      */
-//    private static void requestLocation() {
-//      locationManager.requestSingleUpdate("GPS", new LocationListener() {
-//      @Override
-//      public void onLocationChanged(Location location) {
-//          // TODO: Handle location update
-//      }
-//      @Override
-//      public void onProviderDisabled(String provider) {}
-//      @Override
-//      public void onProviderEnabled(String provider) {}
-//      @Override
-//      public void onStatusChanged(String provider, int status, Bundle extras) {}
-//      
-//  }, null);
-//    }
-
+    public void fetchRegions(final Callback<Void> callback) {
+        new AsyncTask<Void, Void, String>() {
+            @Override
+            protected void onPreExecute() {}
+            @Override
+            protected String doInBackground(Void... params) {
+                BufferedReader in = null;
+                try {
+                    // http request
+                    HttpClient client = new DefaultHttpClient();
+                    HttpGet request = new HttpGet();
+                    request.setURI(new URI(regionDataUrl));
+                    HttpResponse response = client.execute(request);
+                    
+                    // Read body
+                    in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+                    StringBuffer data = new StringBuffer("");
+                    String line;
+                    while((line = in.readLine()) != null) {
+                        data.append(line);
+                        data.append('\n');
+                    }
+                    return data.toString();
+                } catch(URISyntaxException e) {
+                    Log.w("Regions", "Error parsing region data url");
+                } catch(IOException e) {
+                    Log.w("Regions", "Failed to download new region data");
+                } finally {
+                    if(in != null) {
+                        try {
+                            in.close();
+                        } catch (IOException e) {}
+                    }
+                }
+                return null;
+            }
+            @Override
+            protected void onPostExecute(String regionData) {
+                Regions.this.regionData = regionData;
+                parseRegionData();
+                // TODO: Store to preferences
+                callback.callback(null);
+            }
+        }.execute();
+    }
+    
     /**
-     * Finds the current location by GPS, and then determines the closest region in the database
+     * Returns a list of region names
      */
-//    private static Region findClosestRegion(Location currentLocation) {
-//        if(currentLocation == null) return null;
-//        
-//        Region bestRegion = null;
-//        float bestDistance = Float.POSITIVE_INFINITY;
-//        for(Region region : regions) {
-//            float distance = region.getLocation().distanceTo(currentLocation);
-//            if(distance < bestDistance) {
-//                bestRegion = region;
-//                bestDistance = distance;
-//            }
-//        }
-//        return bestRegion;
-//    }
-
-    public static CharSequence[] getRegionNames() {
+    public CharSequence[] getRegionNames() {
         CharSequence[] names = new CharSequence[regions.size()];
         for(int i = 0; i < regions.size(); i++)
-            names[i] = regions.get(i).getName();
+            names[i] = regions.get(i).regionName;
         return names;
     }
 
     /**
      * Returns the region with the given name
      */
-    public static Region getRegion(CharSequence name) {
+    public Region getRegion(CharSequence name) {
         for(Region region : regions)
-            if(region.getName().equals(name))
+            if(region.regionName.equals(name))
                 return region;
         return null;
     }
     
-    public static int indexOf(String regionName) {
+    /**
+     * Returns the index of the given regionName. Useful for ui lists.
+     */
+    public int indexOf(String regionName) {
         for(int i = 0; i < regions.size(); i++)
-            if(regions.get(i).getName().equals(regionName))
+            if(regions.get(i).regionName.equals(regionName))
                 return i;
         return -1;
     }

@@ -19,6 +19,7 @@ public class AvalancheRisk {
                                           "Widespread natural or human triggered avalanches certain.  Extremely unstable slabs certain on most aspects and slope angles. Large destructive avalanches possible.  Travel in avalanche terrain should be avoided and travel confined to low angle terrain well away from avalanche path run-outs."};
     
     public static Rating parseRating(String str) {
+        // TODO: More robust selector
         Log.i("AvalancheRisk", "parsing: \"" + str + "\"");
         if(str.matches("Extreme")) return Rating.EXTREME;
         else if(str.matches("High")) return Rating.HIGH;
