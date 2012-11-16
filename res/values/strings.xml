@@ -31,17 +31,7 @@
 	\"ratingSelector\": \"table.contentpaneopen .rating div\",
 	\"detailsSelector\": \"table.contentpaneopen\",
 	\"latitude\": 41.409196,
-	\"longitude\": -122.194888 },
-	
- {	\"regionName\": \"Los Angeles\",
-	\"centerName\": \"Fake Avalanche Center\",
-	\"bannerUrl\": \"http://platypiiindustries.com/AvyAlert/banners/losangeles.jpg\",
-	\"advisoryUrl\": \"http://platypiiindustries.com/AvyAlert/advisory\",
-	\"dateSelector\": \"div.forecast-advisory strong\",
-	\"ratingSelector\": \"div.forecast-advisory .rating div:eq(0)\",
-	\"detailsSelector\": \"div.forecast-advisory\",
-	\"latitude\": 34.05,
-	\"longitude\": -118.25 }
+	\"longitude\": -122.194888 }
 ]
 	</string>
     

@@ -28,6 +28,8 @@ public class Regions {
     // URL to get updates to region definitions
     private static final String regionDataUrl = "http://platypiiindustries.com/AvyAlert/regions";
     
+    private SharedPreferences prefs;
+    
     private String regionData;
 
     public List<Region> regions = new ArrayList<Region>();
@@ -35,7 +37,7 @@ public class Regions {
     
     public Regions(Context context) {
         // Load region data from preferences
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        prefs = PreferenceManager.getDefaultSharedPreferences(context);
         regionData = prefs.getString("regionData", null);
         
         if(regionData == null) {
@@ -66,7 +68,7 @@ public class Regions {
      * Fetches new region data from the internet
      * @param callback callback to notify of new region data
      */
-    public void fetchRegions(final Callback<Void> callback) {
+    public void fetchRegionData(final Callback<Regions> callback) {
         new AsyncTask<Void, Void, String>() {
             @Override
             protected void onPreExecute() {}
@@ -104,10 +106,18 @@ public class Regions {
             }
             @Override
             protected void onPostExecute(String regionData) {
-                Regions.this.regionData = regionData;
-                parseRegionData();
-                // TODO: Store to preferences
-                callback.callback(null);
+                if(regionData != null && !regionData.equals("") && !regionData.equals(Regions.this.regionData)) {
+                    Log.i("Regions", "Downloaded new region data");
+                    // New region data
+                    Regions.this.regionData = regionData;
+                    parseRegionData();
+                    // Store to preferences
+                    final SharedPreferences.Editor prefsEditor = prefs.edit();
+                    prefsEditor.putString("regionData", regionData);
+                    prefsEditor.commit();
+                    // Callback
+                    callback.callback(Regions.this);
+                }
             }
         }.execute();
     }

@@ -27,6 +27,7 @@ public class GCMIntentService extends GCMBaseIntentService {
     protected void onMessage(Context context, Intent intent) {
         Log.d("Push", "onMessage(" + intent + ")");
         // TODO: Update avalanche advisory
+        // Alerter.notifyUser(context, advisory);
     }
     @Override
     protected void onError(Context context, String errorId) {

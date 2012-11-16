@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-   	<ProgressBar 
+   	<ProgressBar
 		android:id="@+id/loading"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
@@ -12,6 +12,7 @@
 		android:visibility="gone" />
    	
    	<ScrollView 
+		android:id="@+id/scrollView"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:fillViewport="true" >
@@ -45,17 +46,7 @@
 			        android:adjustViewBounds="true"
 			        android:contentDescription="Danger Rating"
 			        android:padding="0dp" />
-<!-- 	   		    
-				<TextView
-		            android:id="@+id/dangerLabel"
-		            style="@android:style/TextAppearance.Large"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:layout_alignParentLeft="true"
-		            android:layout_alignParentTop="true"
-		            android:textSize="15pt"
-		            android:text="Danger: " />
- -->
+
 		        <TextView
 		            android:id="@+id/ratingLabel"
 		            style="@android:style/TextAppearance.Large"

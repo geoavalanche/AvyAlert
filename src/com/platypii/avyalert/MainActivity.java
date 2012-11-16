@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 
@@ -37,6 +38,7 @@ public class MainActivity extends Activity {
 
     // Views
     private ProgressBar loading;
+    private ScrollView scrollView;
     
     // Region (banner)
     private ImageView regionView;
@@ -68,6 +70,7 @@ public class MainActivity extends Activity {
 
         // Find views
         loading = (ProgressBar) findViewById(R.id.loading);
+        scrollView = (ScrollView) findViewById(R.id.scrollView);
         regionView = (ImageView) findViewById(R.id.regionView);
         advisoryView = findViewById(R.id.advisoryView);
         linkView = findViewById(R.id.linkView);
@@ -109,10 +112,84 @@ public class MainActivity extends Activity {
             showRegionDialog();
         }
 
-        // Fetch the latest advisory
-        fetchAdvisory();
+        // TODO: Also check if the currentAdvisory is stale
+        if(currentAdvisory == null) {
+            // Fetch the latest advisory
+            fetchAdvisory();
+        }
+        
+        // Update region data
+        regions.fetchRegionData(new Callback<Regions>() {
+            @Override
+            public void callback(Regions result) {
+                if(result != null && currentRegion != null) {
+                    currentRegion = regions.getRegion(currentRegion.regionName);
+                    if(currentRegion == null) {
+                        // Current region no long exists
+                        currentAdvisory = null;
+                        updateAdvisory();
+                    } else {
+                        // Fetch new advisory
+                        fetchAdvisory();
+                    }
+                }
+                updateRegion();
+            }
+        });
     }
 
+    /**
+     * Prompt the user to choose their region
+     */
+    private void showRegionDialog() {
+        final CharSequence[] regionNames = regions.getRegionNames();
+        final int index = currentRegion == null? -1 : regions.indexOf(currentRegion.regionName);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Avalanche Region");
+        builder.setItems(regionNames, null);
+        builder.setSingleChoiceItems(regionNames, index, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                final CharSequence regionName = regionNames[which];
+                setCurrentRegion(regionName);
+                dialog.dismiss();
+            }
+        });
+        builder.show();
+    }
+
+    /**
+     * Sets the current region, and updates the advisory if the region changed
+     */
+    private void setCurrentRegion(CharSequence regionName) {
+        final Region newRegion = regions.getRegion(regionName);
+        if(newRegion == null) {
+            Log.w("RegionDialog", "Null region, wtf?");
+            currentRegion = null;
+            currentAdvisory = null;
+            updateRegion();
+            updateAdvisory();
+        } else if(currentRegion == null || !currentRegion.regionName.equals(newRegion.regionName)) {
+            // Change region
+            currentRegion = newRegion;
+            currentAdvisory = null;
+            updateRegion();
+            updateAdvisory();
+            // Fetch new Advisory
+            fetchAdvisory();
+        } else {
+            // Same region
+            // TODO: refresh here?
+            if(currentAdvisory == null) {
+                fetchAdvisory();
+            }
+        }
+        // Store to preferences
+        final SharedPreferences.Editor prefsEditor = prefs.edit();
+        prefsEditor.putString("currentRegion", currentRegion==null? null : currentRegion.regionName);
+        prefsEditor.commit();
+    }
+    
     /**
      * Loads the region into the current view
      */
@@ -133,40 +210,6 @@ public class MainActivity extends Activity {
             regionView.setVisibility(View.GONE);
             linkView.setVisibility(View.GONE);
         }
-    }
-
-    /**
-     * Prompt the user to choose their region
-     */
-    private void showRegionDialog() {
-        final CharSequence[] regionNames = regions.getRegionNames();
-        final int index = currentRegion == null? -1 : regions.indexOf(currentRegion.regionName);
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Avalanche Region");
-        builder.setItems(regionNames, null);
-        builder.setSingleChoiceItems(regionNames, index, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                final CharSequence regionName = regionNames[which];
-                final Region newRegion = regions.getRegion(regionName);
-                if(newRegion == null) Log.w("RegionDialog", "Null region, wtf?");
-                if(currentRegion == null || !currentRegion.regionName.equals(regionName)) {
-                    // Change region
-                    currentRegion = regions.getRegion(regionName);
-                    currentAdvisory = null;
-                    updateRegion();
-                    updateAdvisory();
-                    // Fetch new Advisory
-                    fetchAdvisory();
-                    // Store to preferences
-                    final SharedPreferences.Editor prefsEditor = prefs.edit();
-                    prefsEditor.putString("currentRegion", regionName.toString());
-                    prefsEditor.commit();
-                }
-                dialog.dismiss();
-            }
-        });
-        builder.show();
     }
 
     /**
@@ -276,4 +319,20 @@ public class MainActivity extends Activity {
         }
     }
     
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("SCROLL_X", scrollView.getScrollX());
+        outState.putInt("SCROLL_Y", scrollView.getScrollY());
+    }
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        final int x = savedInstanceState.getInt("SCROLL_X", 0);
+        final int y = savedInstanceState.getInt("SCROLL_Y", 0);
+        scrollView.post(new Runnable() {
+            public void run() {
+                scrollView.scrollTo(x, y);
+            }
+        });
+    }
+
 }
