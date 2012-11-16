@@ -8,18 +8,18 @@
         <CheckBoxPreference
             android:key="enablePush"
             android:title="Push Notifications"
-            android:summary="Receive an alert when there is a new advisory"
+            android:summary="Receive an alerts for new advisories"
             android:defaultValue="false" />
 
 		<ListPreference
 			android:key="currentRegion"
 			android:title="Avalanche Region"
-			android:summary="Select your local avalanche center"
+			android:summary="Select your local avalanche center to receive alerts from"
 			android:enabled="false" />
 
 		<PreferenceScreen
 			android:title="Danger Level"
-			android:summary="Control alerts based on the avalanche danger level" >
+			android:summary="Control alerts based on the danger level" >
 
 			<PreferenceCategory
 				android:title="Avalanche Danger Level" >

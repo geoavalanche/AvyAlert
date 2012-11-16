@@ -6,7 +6,6 @@ import org.jsoup.nodes.Document;
 import android.os.AsyncTask;
 import android.util.Log;
 import com.platypii.avyalert.Advisory;
-import com.platypii.avyalert.AvalancheRisk;
 import com.platypii.avyalert.R;
 import com.platypii.avyalert.AvalancheRisk.Rating;
 import com.platypii.avyalert.Callback;
@@ -44,7 +43,7 @@ public class Region {
         Rating rating = Rating.NONE;
         if(ratingSelector != null && !ratingSelector.equals("")) {
             String ratingText = doc.select(ratingSelector).text();
-            rating = AvalancheRisk.parseRating(ratingText);
+            rating = parseRating(ratingText);
         }
         
         // Parse details
@@ -56,6 +55,18 @@ public class Region {
         // TODO: Download avalanche rose
         
         return new Advisory(regionName, date, rating, details);
+    }
+
+    private static Rating parseRating(String str) {
+        if(str.matches("(?si).*Extreme.*")) return Rating.EXTREME;
+        else if(str.matches("(?si).*High.*")) return Rating.HIGH;
+        else if(str.matches("(?si).*Considerable.*")) return Rating.CONSIDERABLE;
+        else if(str.matches("(?si).*Moderate.*")) return Rating.MODERATE;
+        else if(str.matches("(?si).*Low.*")) return Rating.LOW;
+        else {
+            Log.d("Region", "Unable to parse rating from: \"" + str + "\"");
+            return Rating.NONE;
+        }
     }
     
     public void fetchAdvisory(final Callback<Advisory> callback) {

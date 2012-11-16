@@ -55,7 +55,8 @@ public class Alerter {
         Builder builder = new NotificationCompat.Builder(context);
         builder.setContentTitle("Avalanche Risk: " + advisory.rating);
         builder.setTicker("Avalanche Risk: " + advisory.rating);
-        builder.setContentText(advisory.details);
+        String details = advisory.details.replaceAll("(?s)<.*>", ""); // Remove tags
+        builder.setContentText(details);
         builder.setSmallIcon(AvalancheRisk.getImage(advisory.rating));
         builder.setAutoCancel(true);
         // builder.setVibrate(new long[] {0, 140, 70, 220});

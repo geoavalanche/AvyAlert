@@ -1,7 +1,5 @@
 package com.platypii.avyalert;
 
-import android.util.Log;
-
 
 /**
  * This class contains general knowledge about avalanche risk
@@ -17,17 +15,7 @@ public class AvalancheRisk {
                                           "Natural avalanches possible. Skier-triggered avalanches probable.  Unstable slabs probable on steep terrain.  Be increasingly cautious in steeper terrain.",
                                           "Natural and human triggered avalanches likely.  Unstable slabs likely on a variety of aspects and slope angles.  Travel in avalanche terrain is not recommended. Safest travel on windward ridges of lower angle slopes without steeper terrain above.",
                                           "Widespread natural or human triggered avalanches certain.  Extremely unstable slabs certain on most aspects and slope angles. Large destructive avalanches possible.  Travel in avalanche terrain should be avoided and travel confined to low angle terrain well away from avalanche path run-outs."};
-    
-    public static Rating parseRating(String str) {
-        // TODO: More robust selector
-        Log.i("AvalancheRisk", "parsing: \"" + str + "\"");
-        if(str.matches("Extreme")) return Rating.EXTREME;
-        else if(str.matches("High")) return Rating.HIGH;
-        else if(str.matches("Considerable")) return Rating.CONSIDERABLE;
-        else if(str.matches("Moderate")) return Rating.MODERATE;
-        else if(str.matches("Low")) return Rating.LOW;
-        else return Rating.NONE;
-    }
+
     
     /**
      * Returns the RGB color representing the given hazard rating

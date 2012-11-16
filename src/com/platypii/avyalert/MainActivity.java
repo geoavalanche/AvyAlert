@@ -32,23 +32,36 @@ import android.widget.TextView;
 public class MainActivity extends Activity {
 
     static Regions regions; // The avalanche reporting regions
-    private static Region currentRegion; // The current region
-    private static Advisory currentAdvisory; // The advisory currently being displayed
+    private static Region currentRegion = null; // The current region
+    private static Advisory currentAdvisory = null; // The advisory currently being displayed
 
     // Views
     private ProgressBar loading;
+    
+    // Region (banner)
     private ImageView regionView;
+
+    // Advisory
     private View advisoryView;
+    ImageView ratingIcon;
+    TextView ratingLabel;
+    TextView dateLabel;
+    TextView detailsLabel;
+
+    // Link
     private View linkView;
     private TextView centerLabel;
     
-    SharedPreferences prefs;
+    private SharedPreferences prefs;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        
+
+        // Shared Preferences
+        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
         // Load regions
         if(regions == null)
             regions = new Regions(getApplicationContext());
@@ -59,12 +72,16 @@ public class MainActivity extends Activity {
         advisoryView = findViewById(R.id.advisoryView);
         linkView = findViewById(R.id.linkView);
         centerLabel = (TextView) findViewById(R.id.centerLabel);
+        ratingIcon = (ImageView) findViewById(R.id.ratingIcon);
+        ratingLabel = (TextView) findViewById(R.id.ratingLabel);
+        dateLabel = (TextView) findViewById(R.id.dateLabel);
+        detailsLabel = (TextView) findViewById(R.id.detailsLabel);
 
         // Set Click Listeners
         regionView.setOnClickListener(regionListener);
         linkView.setOnClickListener(linkListener);
         
-        // Push notification
+        // Push notifications
         try {
             GCMRegistrar.checkDevice(this);
             GCMRegistrar.checkManifest(this);
@@ -78,25 +95,30 @@ public class MainActivity extends Activity {
             Log.w("Push", "Push notifications not supported");
         }
         
-        // Load region from preferences
-        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String regionName = prefs.getString("currentRegion", null);
-        if(regionName != null) {
-            setRegion(regionName);
-        } else {
+        if(currentRegion == null) {
+            // Load region from preferences
+            String regionName = prefs.getString("currentRegion", null);
+            currentRegion = regions.getRegion(regionName);
+            currentAdvisory = null;
+        }
+        updateRegion();
+        updateAdvisory();
+
+        if(currentRegion == null) {
+            // Show region dialog
             showRegionDialog();
         }
 
+        // Fetch the latest advisory
+        fetchAdvisory();
     }
 
     /**
-     * Sets the current region to the given region, and fetches a new advisory
+     * Loads the region into the current view
      */
     @SuppressLint("NewApi")
-    private void setRegion(CharSequence regionName) {
-        // Change region
-        currentRegion = regions.getRegion(regionName);
-        setAdvisory(null);
+    private void updateRegion() {
+        // Update UI
         if(currentRegion != null) {
             // Update view
             if(android.os.Build.VERSION_CODES.HONEYCOMB <= android.os.Build.VERSION.SDK_INT) {
@@ -107,17 +129,10 @@ public class MainActivity extends Activity {
             regionView.setContentDescription(currentRegion.regionName);
             regionView.setVisibility(View.VISIBLE);
             centerLabel.setText("from " + currentRegion.centerName);
-            
-            // Update Advisory
-            fetchAdvisory();
         } else {
             regionView.setVisibility(View.GONE);
             linkView.setVisibility(View.GONE);
         }
-        // Store to preferences
-        SharedPreferences.Editor prefsEditor = prefs.edit();
-        prefsEditor.putString("currentRegion", regionName.toString());
-        prefsEditor.commit();
     }
 
     /**
@@ -125,16 +140,29 @@ public class MainActivity extends Activity {
      */
     private void showRegionDialog() {
         final CharSequence[] regionNames = regions.getRegionNames();
-        int index = currentRegion == null? -1 : regions.indexOf(currentRegion.regionName);
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final int index = currentRegion == null? -1 : regions.indexOf(currentRegion.regionName);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Avalanche Region");
         builder.setItems(regionNames, null);
         builder.setSingleChoiceItems(regionNames, index, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                CharSequence regionName = regionNames[which];
-                // Update
-                setRegion(regionName);
+                final CharSequence regionName = regionNames[which];
+                final Region newRegion = regions.getRegion(regionName);
+                if(newRegion == null) Log.w("RegionDialog", "Null region, wtf?");
+                if(currentRegion == null || !currentRegion.regionName.equals(regionName)) {
+                    // Change region
+                    currentRegion = regions.getRegion(regionName);
+                    currentAdvisory = null;
+                    updateRegion();
+                    updateAdvisory();
+                    // Fetch new Advisory
+                    fetchAdvisory();
+                    // Store to preferences
+                    final SharedPreferences.Editor prefsEditor = prefs.edit();
+                    prefsEditor.putString("currentRegion", regionName.toString());
+                    prefsEditor.commit();
+                }
                 dialog.dismiss();
             }
         });
@@ -150,7 +178,10 @@ public class MainActivity extends Activity {
             currentRegion.fetchAdvisory(new Callback<Advisory>() {
                 @Override
                 public void callback(Advisory advisory) {
-                    setAdvisory(advisory);
+                    if(advisory != null && advisory.regionName.equals(currentRegion.regionName)) {
+                        currentAdvisory = advisory;
+                        updateAdvisory();
+                    }
                     loading.setVisibility(View.GONE);
                     
                     // Notify user
@@ -163,13 +194,7 @@ public class MainActivity extends Activity {
     /**
      * Loads an advisory into the current view
      */
-    private void setAdvisory(Advisory advisory) {
-        currentAdvisory = advisory;
-        ImageView ratingIcon = (ImageView) findViewById(R.id.ratingIcon);
-        TextView ratingLabel = (TextView) findViewById(R.id.ratingLabel);
-        TextView dateLabel = (TextView) findViewById(R.id.dateLabel);
-        TextView detailsLabel = (TextView) findViewById(R.id.detailsLabel);
-        
+    private void updateAdvisory() {
         if(currentAdvisory != null) {
             ratingLabel.setBackgroundColor(AvalancheRisk.getBackgroundColor(currentAdvisory.rating));
             if(currentAdvisory.rating != Rating.NONE) {
@@ -205,18 +230,8 @@ public class MainActivity extends Activity {
      * Removes img tags, anchor tags, etc
      */
     private static String cleanHtml(String details) {
-        StringBuffer buf = new StringBuffer();
-        details = details.replaceAll("<(img|IMG)", "<img"); // Handle img or IMG
-        details = details.replaceAll("</?[aA].*>", ""); // Handle img or IMG
-        int i = 0;
-        while(i != -1 && i < details.length()) {
-            int j = details.indexOf("<img", i + 1);
-            if(j == -1) j = details.length();
-            buf.append(details.substring(i, j));
-            i = details.indexOf(">", j);
-            if(i != -1) i++;
-        }
-        return buf.toString();
+        details = details.replaceAll("(?si)</?(img|a).*?>", ""); // Remove images and links
+        return details;
     }
 
     private View.OnClickListener regionListener = new View.OnClickListener() {

@@ -16,7 +16,7 @@
  {	\"regionName\": \"Lake Tahoe\",
 	\"centerName\": \"Sierra Avalanche Center\",
 	\"bannerUrl\": \"http://platypiiindustries.com/AvyAlert/banners/laketahoe.jpg\",
-	\"advisoryUrl\": \"http://sierraavalanchecetner.org/advisory\",
+	\"advisoryUrl\": \"http://sierraavalanchecenter.org/advisory\",
 	\"dateSelector\": \"div.content strong:eq(0)\",
 	\"ratingSelector\": \"div.content .rating div\",
 	\"detailsSelector\": \"div.content table\",
