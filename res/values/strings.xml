@@ -1,6 +1,13 @@
 <resources>
 
     <string name="app_name">AvyAlert</string>
+    
+	<string name="danger1">Natural avalanches very unlikely. Skier-triggered avalanches unlikely.  Generally stable snow. Isolated areas of instability.  Travel is generally safe. Normal caution advised.</string>
+	<string name="danger2">"Natural avalanches unlikely. Skier-triggered avalanches possible.  Unstable slabs possible on steep terrain.  Use caution in steeper terrain on certain aspects.</string>
+	<string name="danger3">"Natural avalanches possible. Skier-triggered avalanches probable.  Unstable slabs probable on steep terrain.  Be increasingly cautious in steeper terrain.</string>
+	<string name="danger4">"Natural and human triggered avalanches likely.  Unstable slabs likely on a variety of aspects and slope angles.  Travel in avalanche terrain is not recommended. Safest travel on windward ridges of lower angle slopes without steeper terrain above.</string>
+	<string name="danger5">"Widespread natural or human triggered avalanches certain.  Extremely unstable slabs certain on most aspects and slope angles. Large destructive avalanches possible.  Travel in avalanche terrain should be avoided and travel confined to low angle terrain well away from avalanche path run-outs.</string>
+
     <string name="default_region_data" formatted="true">
 [
  {	\"regionName\": \"Eastern Sierra\",

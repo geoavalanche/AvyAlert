@@ -26,9 +26,9 @@ public class Advisory {
     
     // public boolean notified = false; // Has the user been notified of this advisory?
 
-    private static final int FG_COLOR = 0xffeeeeee;
+    private static final int FG_COLOR = 0xffdddddd;
     private static final int BG_COLOR = 0x00000000;
-    private static final int MIN_HEIGHT = 600; // Minimum image height, otherwise scale up
+    private static final int MIN_HEIGHT = 300; // Minimum image height, otherwise scale up
     
     
     public Advisory(Region region, String date, Rating rating, String roseUrl, String details) {

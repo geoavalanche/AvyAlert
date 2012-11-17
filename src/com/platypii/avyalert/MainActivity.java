@@ -1,9 +1,6 @@
 package com.platypii.avyalert;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.net.URL;
-import java.net.URLConnection;
 import com.platypii.avyalert.R;
 import com.platypii.avyalert.AvalancheRisk.Rating;
 import com.platypii.avyalert.regions.Region;
@@ -17,10 +14,10 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
@@ -38,28 +35,30 @@ import android.widget.TextView;
  */
 public class MainActivity extends Activity {
 
-    static Regions regions; // The avalanche reporting regions
     private static Region currentRegion = null; // The current region
     private static Advisory currentAdvisory = null; // The advisory currently being displayed
 
     // Views
-    private ProgressBar loading;
     private ScrollView scrollView;
     
     // Region (banner)
     private ImageView regionView;
 
     // Advisory
-    private View advisoryView;
-    ImageView ratingIcon;
-    TextView ratingLabel;
-    TextView dateLabel;
-    ImageView roseView;
-    TextView detailsLabel;
+    private ImageView ratingIcon;
+    private TextView ratingLabel;
+    private TextView dateLabel;
+    private ImageView roseView;
+    private TextView detailsLabel;
 
     // Link
-    private View linkView;
+    private View advisoryLink;
     private TextView centerLabel;
+    
+    // Overlays
+    private ProgressBar loadingIcon;
+    private View refreshView;
+    private ImageView refreshButton;
     
     private SharedPreferences sharedPrefs;
 
@@ -72,30 +71,33 @@ public class MainActivity extends Activity {
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         // Load regions
-        if(regions == null)
-            regions = new Regions(getApplicationContext());
+        Regions.initRegionData(getApplicationContext());
 
         // Find views
-        loading = (ProgressBar) findViewById(R.id.loading);
         scrollView = (ScrollView) findViewById(R.id.scrollView);
         regionView = (ImageView) findViewById(R.id.regionView);
-        advisoryView = findViewById(R.id.advisoryView);
-        linkView = findViewById(R.id.linkView);
-        centerLabel = (TextView) findViewById(R.id.centerLabel);
+        dateLabel = (TextView) findViewById(R.id.dateLabel);
         ratingIcon = (ImageView) findViewById(R.id.ratingIcon);
         ratingLabel = (TextView) findViewById(R.id.ratingLabel);
-        dateLabel = (TextView) findViewById(R.id.dateLabel);
         roseView = (ImageView) findViewById(R.id.roseView);
         detailsLabel = (TextView) findViewById(R.id.detailsLabel);
+        advisoryLink = findViewById(R.id.advisoryLink);
+        centerLabel = (TextView) findViewById(R.id.centerLabel);
+        loadingIcon = (ProgressBar) findViewById(R.id.loadingIcon);
+        refreshView = findViewById(R.id.refreshView);
+        refreshButton = (ImageView) findViewById(R.id.refreshButton);
 
         // Set Click Listeners
         regionView.setOnClickListener(regionListener);
-        linkView.setOnClickListener(linkListener);
+        ratingIcon.setOnClickListener(infoListener);
+        roseView.setOnClickListener(infoListener);
+        refreshButton.setOnClickListener(refreshListener);
+        advisoryLink.setOnClickListener(linkListener);
         
         if(currentRegion == null) {
             // Load region from preferences
             String regionName = sharedPrefs.getString("currentRegion", null);
-            currentRegion = regions.getRegion(regionName);
+            currentRegion = Regions.getRegion(regionName);
             currentAdvisory = null;
         }
         updateRegion();
@@ -124,12 +126,12 @@ public class MainActivity extends Activity {
      * Fetch region data, then update views accordingly
      */
     private void fetchRegionData() {
-        regions.fetchRegionData(new Callback<Regions>() {
+        Regions.fetchRegionData(sharedPrefs, new Callback<Void>() {
             @Override
-            public void callback(Regions result) {
+            public void callback(Void result) {
                 Log.v("Main", "New region data!");
-                if(result != null && currentRegion != null) {
-                    currentRegion = regions.getRegion(currentRegion.regionName);
+                if(currentRegion != null) {
+                    currentRegion = Regions.getRegion(currentRegion.regionName);
                     if(currentRegion == null) {
                         // Current region no long exists
                         currentAdvisory = null;
@@ -139,6 +141,11 @@ public class MainActivity extends Activity {
                         // Fetch new advisory
                         fetchAdvisory();
                     }
+                }
+                // Region dialog
+                if(regionDialog != null) {
+                    regionDialog.dismiss();
+                    showRegionDialog();
                 }
                 updateRegion();
             }
@@ -150,8 +157,8 @@ public class MainActivity extends Activity {
      * Prompt the user to choose their region
      */
     private void showRegionDialog() {
-        final CharSequence[] regionNames = regions.getRegionNames();
-        final int index = currentRegion == null? -1 : regions.indexOf(currentRegion.regionName);
+        final CharSequence[] regionNames = Regions.getRegionNames();
+        final int index = currentRegion == null? -1 : Regions.indexOf(currentRegion.regionName);
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Avalanche Region");
         builder.setItems(regionNames, null);
@@ -160,17 +167,24 @@ public class MainActivity extends Activity {
             public void onClick(DialogInterface dialog, int which) {
                 final CharSequence regionName = regionNames[which];
                 setCurrentRegion(regionName);
-                dialog.dismiss();
+                dialog.cancel();
             }
         });
-        builder.show();
+        builder.setOnCancelListener(new OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                regionDialog = null;
+            }
+        });
+        regionDialog = builder.show();
     }
+    private AlertDialog regionDialog;
 
     /**
      * Sets the current region, and updates the advisory if the region changed
      */
     private void setCurrentRegion(CharSequence regionName) {
-        final Region newRegion = regions.getRegion(regionName);
+        final Region newRegion = Regions.getRegion(regionName);
         if(newRegion == null) {
             Log.w("RegionDialog", "Null region, wtf?");
             currentRegion = null;
@@ -216,7 +230,7 @@ public class MainActivity extends Activity {
             centerLabel.setText("from " + currentRegion.centerName);
         } else {
             regionView.setVisibility(View.GONE);
-            linkView.setVisibility(View.GONE);
+            advisoryLink.setVisibility(View.GONE);
         }
     }
 
@@ -224,21 +238,37 @@ public class MainActivity extends Activity {
      * Downloads the latest advisory asynchronously, and then updates the views
      */
     private void fetchAdvisory() {
-        if(currentRegion != null) {
-            loading.setVisibility(View.VISIBLE);
-            currentRegion.fetchAdvisory(new Callback<Advisory>() {
+        final Region region = currentRegion;
+        if(region != null) {
+            refreshView.setVisibility(View.GONE);
+            loadingIcon.setVisibility(View.VISIBLE);
+            new AsyncTask<Void, Void, Advisory>() {
                 @Override
-                public void callback(Advisory advisory) {
-                    if(advisory != null && advisory.region.equals(currentRegion)) {
+                protected void onPreExecute() {}
+                @Override
+                protected Advisory doInBackground(Void... params) {
+                    try {
+                        return region.fetchAdvisory();
+                    } catch(IOException e) {
+                        Log.w(region.regionName, "Failed to download advisory");
+                        return null;
+                    }
+                }
+                @Override
+                protected void onPostExecute(Advisory advisory) {
+                    if(currentAdvisory == null && advisory == null) {
+                        // Failed to load any advisory, show refresh button
+                        refreshView.setVisibility(View.VISIBLE);
+                    } else if(advisory != null && advisory.region.equals(currentRegion)) {
                         currentAdvisory = advisory;
                         updateAdvisory();
                     }
-                    loading.setVisibility(View.GONE);
+                    loadingIcon.setVisibility(View.GONE);
                     
                     // Notify user
-                    Alerter.notifyUser(MainActivity.this, advisory);
+                    Alerter.notifyUser(getApplicationContext(), advisory);
                 }
-            });
+            }.execute();
         }
     }
     
@@ -287,11 +317,14 @@ public class MainActivity extends Activity {
             detailsLabel.setText(Html.fromHtml(html));
             detailsLabel.setVisibility(View.VISIBLE);
             // Link
-            advisoryView.setVisibility(View.VISIBLE);
-            linkView.setVisibility(View.VISIBLE);
+            advisoryLink.setVisibility(View.VISIBLE);
         } else {
-            advisoryView.setVisibility(View.GONE);
-            linkView.setVisibility(View.GONE);
+            ratingIcon.setVisibility(View.GONE);
+            ratingLabel.setVisibility(View.GONE);
+            dateLabel.setVisibility(View.GONE);
+            roseView.setVisibility(View.GONE);
+            detailsLabel.setVisibility(View.GONE);
+            advisoryLink.setVisibility(View.GONE);
         }
     }
     
@@ -303,24 +336,41 @@ public class MainActivity extends Activity {
         return details;
     }
 
+    // Listeners
     private View.OnClickListener regionListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            // Show region dialog
             showRegionDialog();
         }
     };
-
     private View.OnClickListener linkListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            // Open Advisory URL
             if(currentRegion != null) {
+                // Open Advisory URL
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(currentRegion.advisoryUrl));
                 startActivity(browserIntent);
             } else {
                 Log.w("MainActivity", "User clicked link, but no region selected. WTF?");
             }
+        }
+    };
+    private View.OnClickListener refreshListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            refreshView.setVisibility(View.GONE);
+            if(currentRegion != null) {
+                fetchAdvisory();
+            } else {
+                showRegionDialog();
+            }
+        }
+    };
+    private View.OnClickListener infoListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            // Open information
+            startActivity(new Intent(MainActivity.this, InfoActivity.class));
         }
     };
 
@@ -363,7 +413,10 @@ public class MainActivity extends Activity {
     
     @Override
     protected void onDestroy() {
-        // TODO: Stop AsyncTasks
+        if(regionDialog != null) {
+            regionDialog.cancel();
+        }
+        // TODO: Stop AsyncTasks?
         // GCMRegistrar.onDestroy(this);
         super.onDestroy();
     }

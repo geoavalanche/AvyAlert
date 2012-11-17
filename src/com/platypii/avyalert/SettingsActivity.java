@@ -2,6 +2,7 @@ package com.platypii.avyalert;
 
 import com.platypii.avyalert.R;
 import com.platypii.avyalert.billing.BillingActivity;
+import com.platypii.avyalert.regions.Regions;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -38,7 +39,7 @@ public class SettingsActivity extends PreferenceActivity {
         });
         
         ListPreference regionPref = (ListPreference) findPreference("currentRegion");
-        CharSequence regions[] = MainActivity.regions.getRegionNames();
+        CharSequence regions[] = Regions.getRegionNames();
         regionPref.setEntries(regions);
         regionPref.setEntryValues(regions);
         regionPref.setDefaultValue(regions[0]);

@@ -4,12 +4,10 @@ import java.io.IOException;
 import java.util.Locale;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import android.os.AsyncTask;
 import android.util.Log;
 import com.platypii.avyalert.Advisory;
 import com.platypii.avyalert.R;
 import com.platypii.avyalert.AvalancheRisk.Rating;
-import com.platypii.avyalert.Callback;
 
 
 public class Region {
@@ -28,32 +26,13 @@ public class Region {
     public double longitude;
     
     
-    public void fetchAdvisory(final Callback<Advisory> callback) {
-        Log.v(regionName, "Fetching advisory: " + advisoryUrl);
-        new AsyncTask<Void, Void, Advisory>() {
-            @Override
-            protected void onPreExecute() {}
-            @Override
-            protected Advisory doInBackground(Void... params) {
-                try {
-                    return getAdvisory();
-                } catch(IOException e) {
-                    Log.w(regionName, "Failed to download advisory");
-                    return null;
-                }
-            }
-            @Override
-            protected void onPostExecute(Advisory advisory) {
-                callback.callback(advisory);
-            }
-        }.execute();
-    }
-    
     /**
      * Returns the most recent Advisory for this region
      * @throws IOException If the download fails
      */
-    private Advisory getAdvisory() throws IOException {
+    public Advisory fetchAdvisory() throws IOException {
+        Log.v(regionName, "Fetching advisory: " + advisoryUrl);
+
         // Download advisory
         Document doc = Jsoup.connect(advisoryUrl).get();
         

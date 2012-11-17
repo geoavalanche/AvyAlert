@@ -1,0 +1,179 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/scrollView"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:fillViewport="true" >
+
+	<RelativeLayout
+        android:id="@+id/advisoryView"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content" >
+
+		<ImageView
+            android:id="@+id/ratingIcon1"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+	        android:adjustViewBounds="true"
+	        android:contentDescription="Danger Rating"
+	        android:src="@drawable/danger1"
+	        android:padding="0dp" />
+
+        <TextView
+            android:id="@+id/ratingLabel1"
+            style="@android:style/TextAppearance.Large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+	        android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignBaseline="@+id/ratingIcon1"
+            android:paddingRight="4dp"
+            android:paddingLeft="4dp"
+            android:textSize="15pt"
+            android:text="LOW" />
+
+	    <TextView
+            android:id="@+id/ratingDesc1"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@+id/ratingLabel1"
+	        android:padding="2dp"
+	        android:text="@string/danger1" />
+
+		<ImageView
+            android:id="@+id/ratingIcon2"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@+id/ratingDesc1"
+            android:layout_alignParentLeft="true"
+	        android:adjustViewBounds="true"
+	        android:contentDescription="Danger Rating"
+	        android:src="@drawable/danger2"
+	        android:padding="0dp" />
+
+        <TextView
+            android:id="@+id/ratingLabel2"
+            style="@android:style/TextAppearance.Large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+	        android:layout_below="@+id/ratingDesc1"
+            android:layout_alignParentRight="true"
+            android:layout_alignBaseline="@+id/ratingIcon2"
+            android:paddingRight="4dp"
+            android:paddingLeft="4dp"
+            android:textSize="15pt"
+            android:text="MODERATE" />
+
+	    <TextView
+            android:id="@+id/ratingDesc2"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@+id/ratingLabel2"
+	        android:padding="2dp"
+	        android:text="@string/danger2" />
+
+		<ImageView
+            android:id="@+id/ratingIcon3"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@+id/ratingDesc2"
+            android:layout_alignParentLeft="true"
+	        android:adjustViewBounds="true"
+	        android:contentDescription="Danger Rating"
+	        android:src="@drawable/danger3"
+	        android:padding="0dp" />
+
+        <TextView
+            android:id="@+id/ratingLabel3"
+            style="@android:style/TextAppearance.Large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+	        android:layout_below="@+id/ratingDesc2"
+            android:layout_alignParentRight="true"
+            android:layout_alignBaseline="@+id/ratingIcon3"
+            android:paddingRight="4dp"
+            android:paddingLeft="4dp"
+            android:textSize="15pt"
+            android:text="CONSIDERABLE" />
+
+	    <TextView
+            android:id="@+id/ratingDesc3"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@+id/ratingLabel3"
+	        android:padding="2dp"
+	        android:text="@string/danger3" />
+
+		<ImageView
+            android:id="@+id/ratingIcon4"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@+id/ratingDesc3"
+            android:layout_alignParentLeft="true"
+	        android:adjustViewBounds="true"
+	        android:contentDescription="Danger Rating"
+	        android:src="@drawable/danger4"
+	        android:padding="0dp" />
+
+        <TextView
+            android:id="@+id/ratingLabel4"
+            style="@android:style/TextAppearance.Large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+	        android:layout_below="@+id/ratingDesc3"
+            android:layout_alignParentRight="true"
+            android:layout_alignBaseline="@+id/ratingIcon4"
+            android:paddingRight="4dp"
+            android:paddingLeft="4dp"
+            android:textSize="15pt"
+            android:text="HIGH" />
+
+	    <TextView
+            android:id="@+id/ratingDesc4"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@+id/ratingLabel4"
+	        android:padding="2dp"
+	        android:text="@string/danger4" />
+
+		<ImageView
+            android:id="@+id/ratingIcon5"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@+id/ratingDesc4"
+            android:layout_alignParentLeft="true"
+	        android:adjustViewBounds="true"
+	        android:contentDescription="Danger Rating"
+	        android:src="@drawable/danger5"
+	        android:padding="0dp" />
+
+        <TextView
+            android:id="@+id/ratingLabel5"
+            style="@android:style/TextAppearance.Large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+	        android:layout_below="@+id/ratingDesc4"
+            android:layout_alignParentRight="true"
+            android:layout_alignBaseline="@+id/ratingIcon5"
+            android:paddingRight="4dp"
+            android:paddingLeft="4dp"
+            android:textSize="15pt"
+            android:text="EXTREME" />
+
+	    <TextView
+            android:id="@+id/ratingDesc5"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@+id/ratingLabel5"
+	        android:padding="2dp"
+	        android:text="@string/danger5" />
+
+	</RelativeLayout>
+	
+</ScrollView>

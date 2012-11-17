@@ -3,6 +3,7 @@ package com.platypii.avyalert;
 import java.util.Calendar;
 import com.google.android.gcm.GCMRegistrar;
 import com.platypii.avyalert.AvalancheRisk.Rating;
+import com.platypii.avyalert.regions.Regions;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -18,7 +19,6 @@ import android.util.Log;
 
 public class Alerter {
 
-    private static final int ADVISORY_NOTI = 0; // Tag for the advisory notification
 
     /**
      * Notify the user of advisory
@@ -76,7 +76,7 @@ public class Alerter {
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         
-        notificationManager.notify(ADVISORY_NOTI, noti);
+        notificationManager.notify(Regions.indexOf(advisory.region.regionName), noti);
     }
 
     /**
