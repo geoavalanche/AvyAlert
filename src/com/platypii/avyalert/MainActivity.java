@@ -58,7 +58,6 @@ public class MainActivity extends Activity {
     // Overlays
     private ProgressBar loadingIcon;
     private View refreshView;
-    private ImageView refreshButton;
     
     private SharedPreferences sharedPrefs;
 
@@ -85,13 +84,12 @@ public class MainActivity extends Activity {
         centerLabel = (TextView) findViewById(R.id.centerLabel);
         loadingIcon = (ProgressBar) findViewById(R.id.loadingIcon);
         refreshView = findViewById(R.id.refreshView);
-        refreshButton = (ImageView) findViewById(R.id.refreshButton);
 
         // Set Click Listeners
         regionView.setOnClickListener(regionListener);
         ratingIcon.setOnClickListener(infoListener);
         roseView.setOnClickListener(infoListener);
-        refreshButton.setOnClickListener(refreshListener);
+        refreshView.setOnClickListener(refreshListener);
         advisoryLink.setOnClickListener(linkListener);
         
         if(currentRegion == null) {

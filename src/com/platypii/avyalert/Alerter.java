@@ -27,7 +27,7 @@ public class Alerter {
         if(advisory == null) return;
 
         // Preferences
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         // Control whether we notify or not
         if(advisory.rating == Rating.NONE) {
@@ -57,8 +57,8 @@ public class Alerter {
         Builder builder = new NotificationCompat.Builder(context);
         builder.setContentTitle("Avalanche Risk: " + advisory.rating);
         builder.setTicker("Avalanche Risk: " + advisory.rating);
-        String details = advisory.details.replaceAll("(?s)<.*?>", ""); // Remove tags
-        details = details.replaceAll("^[ \t\n]*", ""); // Remove whitespace from start
+        String details = "[" + advisory.region.regionName + "] ";
+        details += advisory.details.replaceAll("(?s)<.*?>", ""); // Remove tags
         details = details.replaceAll("[ \t\n]+", " "); // Remove extra whitespace
         builder.setContentText(details);
         builder.setSmallIcon(AvalancheRisk.getImage(advisory.rating));

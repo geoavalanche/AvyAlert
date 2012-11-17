@@ -44,21 +44,23 @@ public class Advisory {
      */
     public Bitmap fetchImage() {
         Bitmap bmp = fetchBitmap(roseUrl);
-        int fg = FG_COLOR;
-        int bg = BG_COLOR;
-        try {
-            fg = Color.parseColor(region.roseForegroundColor);
-        } catch(IllegalArgumentException e) {
-        } catch(NullPointerException e) {}
-        try {
-            bg = Color.parseColor(region.roseBackgroundColor);
-        } catch(IllegalArgumentException e) {
-        } catch(NullPointerException e) {}
-        bmp = replaceColor(bmp, fg, bg);
-        // Scale up
-        if(bmp.getHeight() < MIN_HEIGHT) {
-            int width = MIN_HEIGHT * bmp.getWidth() / bmp.getHeight();
-            bmp = Bitmap.createScaledBitmap(bmp, width, MIN_HEIGHT, true);
+        if(bmp != null) {
+            int fg = FG_COLOR;
+            int bg = BG_COLOR;
+            try {
+                fg = Color.parseColor(region.roseForegroundColor);
+            } catch(IllegalArgumentException e) {
+            } catch(NullPointerException e) {}
+            try {
+                bg = Color.parseColor(region.roseBackgroundColor);
+            } catch(IllegalArgumentException e) {
+            } catch(NullPointerException e) {}
+            bmp = replaceColor(bmp, fg, bg);
+            // Scale up
+            if(bmp.getHeight() < MIN_HEIGHT) {
+                int width = MIN_HEIGHT * bmp.getWidth() / bmp.getHeight();
+                bmp = Bitmap.createScaledBitmap(bmp, width, MIN_HEIGHT, true);
+            }
         }
         return bmp;
     }
@@ -87,6 +89,7 @@ public class Advisory {
      * @return
      */
     private static Bitmap replaceColor(Bitmap in, int fg, int bg) {
+        if(in == null) return null;
         Bitmap out = Bitmap.createBitmap(in.getWidth(), in.getHeight(), Bitmap.Config.ARGB_8888);
         for(int x = 0; x < in.getWidth(); x++) {
             for(int y = 0; y < in.getHeight(); y++) {

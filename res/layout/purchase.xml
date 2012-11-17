@@ -8,14 +8,16 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_alignParentTop="true"
-		android:text="Push Notifications require a subscription.\n\nSubscription costs $2.99 / year, and will give you push notifications to your phone for the whole ski season." />
+		android:text="A subscription is required to receive Push Notifications.\n\nSubscription costs $2.99 / year, and will give you push notifications to your phone for the entire ski season.\n\nSubscription fees help me cover the cost of running the notification server, Clif Bars and PBR.\n" />
     
    	<Button
 		android:id="@+id/buyButton"
-		android:layout_width="wrap_content"
+		android:background="@drawable/link"
+		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_below="@+id/explanationLabel"
 		android:layout_centerHorizontal="true"
-		android:text="Buy" />
+		android:layout_marginTop="6dp"
+		android:text="Enable Push Notifications" />
 
 </RelativeLayout>

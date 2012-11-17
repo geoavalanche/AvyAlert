@@ -108,8 +108,9 @@
 			
 			</LinearLayout>
 			
-			<FrameLayout
+			<View
 				android:id="@+id/refreshView"
+				android:background="@drawable/refresh"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_below="@+id/regionView"
@@ -117,19 +118,7 @@
 				android:layout_alignParentLeft="true"
 				android:layout_alignParentRight="true"
 				android:layout_alignWithParentIfMissing="true"
-				android:visibility="gone" >
-
-				<ImageView
-					android:id="@+id/refreshButton"
-					android:background="@drawable/button"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_gravity="center"
-					android:padding="10dp"
-					android:src="@drawable/refresh"
-					android:contentDescription="Refresh" />
-			
-			</FrameLayout>
+				android:visibility="gone" />
 
 		</RelativeLayout>
 		
