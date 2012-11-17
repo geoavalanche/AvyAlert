@@ -1,6 +1,7 @@
 package com.platypii.avyalert;
 
 import java.util.Calendar;
+import com.google.android.gcm.GCMRegistrar;
 import com.platypii.avyalert.AvalancheRisk.Rating;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -8,6 +9,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
@@ -55,7 +57,9 @@ public class Alerter {
         Builder builder = new NotificationCompat.Builder(context);
         builder.setContentTitle("Avalanche Risk: " + advisory.rating);
         builder.setTicker("Avalanche Risk: " + advisory.rating);
-        String details = advisory.details.replaceAll("(?s)<.*>", ""); // Remove tags
+        String details = advisory.details.replaceAll("(?s)<.*?>", ""); // Remove tags
+        details = details.replaceAll("^[ \t\n]*", ""); // Remove whitespace from start
+        details = details.replaceAll("[ \t\n]+", " "); // Remove extra whitespace
         builder.setContentText(details);
         builder.setSmallIcon(AvalancheRisk.getImage(advisory.rating));
         builder.setAutoCancel(true);
@@ -87,4 +91,50 @@ public class Alerter {
         else return false;
     }
     
+    /**
+     * Register for push notifications, if paid and enabled
+     */
+    public static void enableNotifications(Context context) {
+        // TODO: Check billing state
+        if(true) { // TODO: CHECK BILLING STATE!
+            // Check preference state
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            boolean enablePush = prefs.getBoolean("enablePush", false);
+            if(enablePush) {
+                // Register for GCM updates
+                registerNotifications(context);
+            }
+        }
+    }
+     
+    /**
+     * Register for push notifications from Google Cloud Messaging
+     */
+    private static void registerNotifications(final Context context) {
+        try {
+            GCMRegistrar.checkDevice(context);
+            GCMRegistrar.checkManifest(context);
+            final String regId = GCMRegistrar.getRegistrationId(context);
+            if(regId.equals("")) {
+                GCMRegistrar.register(context, GCMIntentService.SENDER_ID);
+                Log.v("Push", "Registered for push notifications");
+            } else {
+                if(GCMRegistrar.isRegisteredOnServer(context)) {
+                    Log.v("Push", "Already registered for push notifications");
+                } else {
+                    // Try to register again, but not in the UI thread.
+                    new AsyncTask<Void, Void, Void>() {
+                        @Override
+                        protected Void doInBackground(Void... params) {
+                            ServerUtilities.register(context, regId);
+                            return null;
+                        }
+                    }.execute();
+                }
+            }
+        } catch(UnsupportedOperationException e) {
+            Log.w("Push", "Push notifications not supported");
+        }
+
+    }
 }

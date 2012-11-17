@@ -1,11 +1,15 @@
 package com.platypii.avyalert;
 
-import com.google.android.gcm.GCMRegistrar;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
 import com.platypii.avyalert.R;
 import com.platypii.avyalert.AvalancheRisk.Rating;
 import com.platypii.avyalert.regions.Region;
 import com.platypii.avyalert.regions.Regions;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.annotation.SuppressLint;
@@ -15,6 +19,8 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
@@ -48,13 +54,14 @@ public class MainActivity extends Activity {
     ImageView ratingIcon;
     TextView ratingLabel;
     TextView dateLabel;
+    ImageView roseView;
     TextView detailsLabel;
 
     // Link
     private View linkView;
     private TextView centerLabel;
     
-    private SharedPreferences prefs;
+    private SharedPreferences sharedPrefs;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,7 +69,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.main);
 
         // Shared Preferences
-        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         // Load regions
         if(regions == null)
@@ -78,29 +85,16 @@ public class MainActivity extends Activity {
         ratingIcon = (ImageView) findViewById(R.id.ratingIcon);
         ratingLabel = (TextView) findViewById(R.id.ratingLabel);
         dateLabel = (TextView) findViewById(R.id.dateLabel);
+        roseView = (ImageView) findViewById(R.id.roseView);
         detailsLabel = (TextView) findViewById(R.id.detailsLabel);
 
         // Set Click Listeners
         regionView.setOnClickListener(regionListener);
         linkView.setOnClickListener(linkListener);
         
-        // Push notifications
-        try {
-            GCMRegistrar.checkDevice(this);
-            GCMRegistrar.checkManifest(this);
-            final String regId = GCMRegistrar.getRegistrationId(this);
-            if(regId.equals("")) {
-                GCMRegistrar.register(this, GCMIntentService.SENDER_ID);
-            } else {
-                Log.v("Push", "Already registered for push notifications");
-            }
-        } catch(UnsupportedOperationException e) {
-            Log.w("Push", "Push notifications not supported");
-        }
-        
         if(currentRegion == null) {
             // Load region from preferences
-            String regionName = prefs.getString("currentRegion", null);
+            String regionName = sharedPrefs.getString("currentRegion", null);
             currentRegion = regions.getRegion(regionName);
             currentAdvisory = null;
         }
@@ -119,15 +113,28 @@ public class MainActivity extends Activity {
         }
         
         // Update region data
+        fetchRegionData();
+        
+        // Enable notifications (if subscribed and enabled)
+        Alerter.enableNotifications(this);
+
+    }
+
+    /**
+     * Fetch region data, then update views accordingly
+     */
+    private void fetchRegionData() {
         regions.fetchRegionData(new Callback<Regions>() {
             @Override
             public void callback(Regions result) {
+                Log.v("Main", "New region data!");
                 if(result != null && currentRegion != null) {
                     currentRegion = regions.getRegion(currentRegion.regionName);
                     if(currentRegion == null) {
                         // Current region no long exists
                         currentAdvisory = null;
                         updateAdvisory();
+                        showRegionDialog();
                     } else {
                         // Fetch new advisory
                         fetchAdvisory();
@@ -136,6 +143,7 @@ public class MainActivity extends Activity {
                 updateRegion();
             }
         });
+
     }
 
     /**
@@ -185,7 +193,7 @@ public class MainActivity extends Activity {
             }
         }
         // Store to preferences
-        final SharedPreferences.Editor prefsEditor = prefs.edit();
+        final SharedPreferences.Editor prefsEditor = sharedPrefs.edit();
         prefsEditor.putString("currentRegion", currentRegion==null? null : currentRegion.regionName);
         prefsEditor.commit();
     }
@@ -221,7 +229,7 @@ public class MainActivity extends Activity {
             currentRegion.fetchAdvisory(new Callback<Advisory>() {
                 @Override
                 public void callback(Advisory advisory) {
-                    if(advisory != null && advisory.regionName.equals(currentRegion.regionName)) {
+                    if(advisory != null && advisory.region.equals(currentRegion)) {
                         currentAdvisory = advisory;
                         updateAdvisory();
                     }
@@ -256,6 +264,24 @@ public class MainActivity extends Activity {
                 dateLabel.setText("Date: " + currentAdvisory.date);
                 dateLabel.setVisibility(View.VISIBLE);
             }
+            roseView.setVisibility(View.GONE); // Hide for now, show when image is downloaded
+            if(currentAdvisory.roseUrl != null && !currentAdvisory.roseUrl.equals("")) {
+                final String roseUrl = currentAdvisory.roseUrl;
+                // Asynchronously get image
+                new AsyncTask<Void,Void,Bitmap>() {
+                    @Override
+                    protected Bitmap doInBackground(Void... params) {
+                        return currentAdvisory.fetchImage();
+                    }
+                    @Override
+                    protected void onPostExecute(Bitmap result) {
+                        if(roseUrl.equals(currentAdvisory.roseUrl)) {
+                            roseView.setImageBitmap(result);
+                            roseView.setVisibility(View.VISIBLE);
+                        }
+                    }
+                }.execute();
+            }
             // Details
             String html = cleanHtml(currentAdvisory.details);
             detailsLabel.setText(Html.fromHtml(html));
@@ -268,7 +294,7 @@ public class MainActivity extends Activity {
             linkView.setVisibility(View.GONE);
         }
     }
-
+    
     /**
      * Removes img tags, anchor tags, etc
      */
@@ -333,6 +359,13 @@ public class MainActivity extends Activity {
                 scrollView.scrollTo(x, y);
             }
         });
+    }
+    
+    @Override
+    protected void onDestroy() {
+        // TODO: Stop AsyncTasks
+        // GCMRegistrar.onDestroy(this);
+        super.onDestroy();
     }
 
 }

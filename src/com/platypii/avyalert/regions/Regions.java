@@ -69,6 +69,7 @@ public class Regions {
      * @param callback callback to notify of new region data
      */
     public void fetchRegionData(final Callback<Regions> callback) {
+        Log.v("Regions", "Fetching region data: " + regionDataUrl);
         new AsyncTask<Void, Void, String>() {
             @Override
             protected void onPreExecute() {}
@@ -106,8 +107,12 @@ public class Regions {
             }
             @Override
             protected void onPostExecute(String regionData) {
-                if(regionData != null && !regionData.equals("") && !regionData.equals(Regions.this.regionData)) {
-                    Log.i("Regions", "Downloaded new region data");
+                if(regionData == null || regionData.equals("")) {
+                    Log.v("Regions", "Empty region data");
+                } else if(regionData.equals(Regions.this.regionData)) {
+                    Log.v("Regions", "Region data already up to date");
+                } else {
+                    Log.i("Regions", "Received new region data, updating.");
                     // New region data
                     Regions.this.regionData = regionData;
                     parseRegionData();

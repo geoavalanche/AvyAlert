@@ -18,10 +18,12 @@ public class GCMIntentService extends GCMBaseIntentService {
     @Override
     protected void onRegistered(Context context, String regId) {
         Log.d("Push", "onRegistered(" + regId + ")");
+        ServerUtilities.register(context, regId);
     }
     @Override
     protected void onUnregistered(Context context, String regId) {
         Log.d("Push", "onUnregistered(" + regId + ")");
+        ServerUtilities.unregister(context, regId);
     }
     @Override
     protected void onMessage(Context context, Intent intent) {

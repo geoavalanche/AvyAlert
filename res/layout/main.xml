@@ -64,17 +64,27 @@
 			        android:id="@+id/dateLabel"
 			        android:layout_width="match_parent"
 			        android:layout_height="wrap_content"
+			        android:layout_below="@+id/ratingLabel"
 			        android:padding="2dp"
-			        android:text=""
-			        android:layout_below="@+id/ratingLabel" />
+			        android:text="" />
+			    
+			    <ImageView 
+					android:id="@+id/roseView"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_below="@+id/dateLabel"
+					android:padding="0dp"
+			        android:scaleType="centerInside"
+			        android:adjustViewBounds="true"
+			        android:contentDescription="Danger Rose" />
 			    
 				<TextView
 			        android:id="@+id/detailsLabel"
 			        android:layout_width="match_parent"
 			        android:layout_height="wrap_content"
+			        android:layout_below="@+id/roseView"
 			        android:padding="2dp"
-			        android:text=""
-			        android:layout_below="@+id/dateLabel" />
+			        android:text="" />
 				
 			</RelativeLayout>
 	   	    

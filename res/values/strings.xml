@@ -1,24 +1,26 @@
 <resources>
 
     <string name="app_name">AvyAlert</string>
-    <string name="default_region_data" >
+    <string name="default_region_data" formatted="true">
 [
  {	\"regionName\": \"Eastern Sierra\",
 	\"centerName\": \"Eastern Sierra Avalanche Center\",
-	\"bannerUrl\": \"http://platypiiindustries.com/AvyAlert/banners/easternsierra.jpg\",
+	\"bannerUrl\": \"http://platypiiindustries.com/AvyAlert/regions/easternsierra.jpg\",
 	\"advisoryUrl\": \"http://esavalanche.org/advisory\",
-	\"dateSelector\": \"div.forecast-advisory strong\",
+	\"dateSelector\": \"div.forecast-advisory strong:eq(0)\",
 	\"ratingSelector\": \"div.forecast-advisory .rating div:eq(0)\",
+	\"roseSelector\": \"\",
 	\"detailsSelector\": \"div.forecast-advisory\",
 	\"latitude\": 37.630628,
 	\"longitude\": -119.032625 },
 
  {	\"regionName\": \"Lake Tahoe\",
 	\"centerName\": \"Sierra Avalanche Center\",
-	\"bannerUrl\": \"http://platypiiindustries.com/AvyAlert/banners/laketahoe.jpg\",
+	\"bannerUrl\": \"http://platypiiindustries.com/AvyAlert/regions/laketahoe.jpg\",
 	\"advisoryUrl\": \"http://sierraavalanchecenter.org/advisory\",
-	\"dateSelector\": \"div.content strong:eq(0)\",
-	\"ratingSelector\": \"div.content .rating div\",
+	\"dateSelector\": \"div.content table strong:eq(0)\",
+	\"ratingSelector\": \"div.content table a[href=http://avalanche.org/danger_card.php]\",
+	\"roseSelector\": \"div.content table a[href=http://avalanche.state.co.us/pub/fx_danger_rose.php]\",
 	\"detailsSelector\": \"div.content table\",
 	\"latitude\": 39.091667,
 	\"longitude\": -120.041667 },
@@ -29,10 +31,35 @@
 	\"advisoryUrl\": \"http://shastaavalanche.org/advisories/advisories/avalanche-advisory\",
 	\"dateSelector\": \"table.contentpaneopen strong\",
 	\"ratingSelector\": \"table.contentpaneopen .rating div\",
+	\"roseSelector\": \"\",
 	\"detailsSelector\": \"table.contentpaneopen\",
 	\"latitude\": 41.409196,
 	\"longitude\": -122.194888 }
-]
+  ]
 	</string>
+    
+	<!-- In-App Billing -->
+	<string name="billing_not_supported_title">Can\'t make purchases</string>
+	<string name="billing_not_supported_message">The Market billing service is not available at this time.  You can continue to use this app but you won\'t be able to make purchases.</string>
+	<string name="cannot_connect_title">Can\'t connect to Market</string>
+	<string name="cannot_connect_message">This app cannot connect to Market. Your version of Market may be out of date. You can continue to use this app but you won\'t be able to make purchases.</string>
+	<string name="restoring_transactions">Restoring transactions</string>
+	<string name="buy">Buy</string>
+	<string name="upgrade">Upgrade</string>
+	 
+	<!-- The following are reserved skus defined by Market for testing. -->
+	<string name="android_test_canceled">android.test.canceled</string>
+	<string name="android_test_purchased">android.test.purchased</string>
+	<string name="android_test_item_unavailable">android.test.item unavailable</string>
+	<string name="android_test_refunded">android.test.refunded</string>
+	<string name="learn_more">Learn more</string>
+	<string name="select_item">Select an item</string>
+	<string name="edit_payload">Edit Payload</string>
+	<string name="edit_payload_title">Edit the developer payload associated with this purchase</string>
+	<string name="edit_payload_accept">Set</string>
+	<string name="edit_payload_clear">No Payload</string>
+	<string name="items_for_sale">Items for sale</string>
+	<string name="items_you_own">Items you own</string>
+	<string name="recent_transactions">Recent activity</string>
     
 </resources>

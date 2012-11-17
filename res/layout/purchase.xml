@@ -1,0 +1,21 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <TextView 
+		android:id="@+id/explanationLabel"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentTop="true"
+		android:text="Push Notifications require a subscription.\n\nSubscription costs $2.99 / year, and will give you push notifications to your phone for the whole ski season." />
+    
+   	<Button
+		android:id="@+id/buyButton"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/explanationLabel"
+		android:layout_centerHorizontal="true"
+		android:text="Buy" />
+
+</RelativeLayout>
