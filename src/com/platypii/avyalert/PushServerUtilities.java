@@ -33,7 +33,7 @@ import java.util.Random;
 /**
  * Helper class used to communicate with the push server.
  */
-public final class ServerUtilities {
+public final class PushServerUtilities {
 
     // Base URL of the Demo Server (such as http://my_host:8080/gcm-demo)
     static final String SERVER_URL = "http://localhost:8888";

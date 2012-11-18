@@ -2,16 +2,21 @@ package com.platypii.avyalert.billing;
 
 import com.platypii.avyalert.Alerter;
 import com.platypii.avyalert.R;
+import com.platypii.avyalert.SettingsActivity;
 import com.platypii.avyalert.billing.BillingService.RequestPurchase;
 import com.platypii.avyalert.billing.BillingService.RestoreTransactions;
 import com.platypii.avyalert.billing.Consts.PurchaseState;
 import com.platypii.avyalert.billing.Consts.ResponseCode;
+import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -30,6 +35,7 @@ public class BillingActivity extends Activity {
 
     
     /** Called when the activity is first created. */
+    @SuppressLint("NewApi")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +43,12 @@ public class BillingActivity extends Activity {
         
         // Views
         buyButton = (Button) findViewById(R.id.buyButton);
+        
+        // Enable action bar navigation
+        if(android.os.Build.VERSION_CODES.HONEYCOMB <= android.os.Build.VERSION.SDK_INT) {
+            ActionBar actionBar = getActionBar();
+            actionBar.setHomeButtonEnabled(true);
+        }
 
         // Set-up Billing
         handler = new Handler();
@@ -179,6 +191,19 @@ public class BillingActivity extends Activity {
                     Log.d(TAG, "RestoreTransactions error: " + responseCode);
                 }
             }
+        }
+    }
+    
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case android.R.id.home:
+                // Go back
+                startActivity(new Intent(this, SettingsActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 

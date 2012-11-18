@@ -3,8 +3,9 @@ package com.platypii.avyalert;
 import java.io.IOException;
 import com.platypii.avyalert.R;
 import com.platypii.avyalert.AvalancheRisk.Rating;
-import com.platypii.avyalert.regions.Region;
-import com.platypii.avyalert.regions.Regions;
+import com.platypii.avyalert.data.Advisory;
+import com.platypii.avyalert.data.Region;
+import com.platypii.avyalert.data.Regions;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -56,6 +57,7 @@ public class MainActivity extends Activity {
     private TextView centerLabel;
     
     // Overlays
+    private int runningTasks = 0; // Number of AsyncTasks running the background
     private ProgressBar loadingIcon;
     private View refreshView;
     
@@ -92,6 +94,13 @@ public class MainActivity extends Activity {
         refreshView.setOnClickListener(refreshListener);
         advisoryLink.setOnClickListener(linkListener);
         
+        // Check if activity was opened with a specific region
+        Intent intent = getIntent();
+        if(intent != null && intent.hasExtra("com.platypii.avyalert.currrentRegion")) {
+            String regionName = intent.getStringExtra("com.platypii.avyalert.currentRegion");
+            currentRegion = Regions.getRegion(regionName);
+            Log.v("Main", "Opening main activity with region: " + regionName);
+        }
         if(currentRegion == null) {
             // Load region from preferences
             String regionName = sharedPrefs.getString("currentRegion", null);
@@ -118,6 +127,16 @@ public class MainActivity extends Activity {
         // Enable notifications (if subscribed and enabled)
         Alerter.enableNotifications(this);
 
+    }
+    
+    @Override
+    protected void onNewIntent(Intent intent) {
+        Log.v("Main", "Main.onNewIntent("+intent+")");
+        if(intent != null) {
+            String regionName = intent.getStringExtra("com.platypii.avyalert.currentRegion");
+            currentRegion = Regions.getRegion(regionName);
+            Log.v("Main", "Changing main activity to region: " + regionName);
+        }
     }
 
     /**
@@ -240,6 +259,7 @@ public class MainActivity extends Activity {
         if(region != null) {
             refreshView.setVisibility(View.GONE);
             loadingIcon.setVisibility(View.VISIBLE);
+            runningTasks++;
             new AsyncTask<Void, Void, Advisory>() {
                 @Override
                 protected void onPreExecute() {}
@@ -261,7 +281,9 @@ public class MainActivity extends Activity {
                         currentAdvisory = advisory;
                         updateAdvisory();
                     }
-                    loadingIcon.setVisibility(View.GONE);
+                    runningTasks--;
+                    if(runningTasks == 0)
+                        loadingIcon.setVisibility(View.GONE);
                     
                     // Notify user
                     Alerter.notifyUser(getApplicationContext(), advisory);
@@ -303,7 +325,8 @@ public class MainActivity extends Activity {
                     }
                     @Override
                     protected void onPostExecute(Bitmap result) {
-                        if(roseUrl.equals(currentAdvisory.roseUrl)) {
+                        if(currentAdvisory != null && roseUrl.equals(currentAdvisory.roseUrl)) {
+                            // Advisory hasn't changed since we started fetching, so show the rose
                             roseView.setImageBitmap(result);
                             roseView.setVisibility(View.VISIBLE);
                         }
@@ -379,7 +402,7 @@ public class MainActivity extends Activity {
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
+        switch(item.getItemId()) {
             case R.id.menu_region:
                 // Show region dialog
                 showRegionDialog();

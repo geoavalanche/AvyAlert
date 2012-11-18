@@ -3,7 +3,8 @@ package com.platypii.avyalert;
 import java.util.Calendar;
 import com.google.android.gcm.GCMRegistrar;
 import com.platypii.avyalert.AvalancheRisk.Rating;
-import com.platypii.avyalert.regions.Regions;
+import com.platypii.avyalert.data.Advisory;
+import com.platypii.avyalert.data.Regions;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -52,9 +53,16 @@ public class Alerter {
         Log.i("Alerter", "Notifying user");
         
         // Intent to open the advisory in AvyAlert
-        PendingIntent openAdvisory = PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), 0);
+        final Intent intent = new Intent(context, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("com.platypii.avyalert.currentRegion", advisory.region.regionName);
+        intent.setAction("com.platypii.avyalert.open" + advisory.region.regionName.replaceAll(" ", ""));
+        final PendingIntent openAdvisory = PendingIntent.getActivity(context, 0, intent, 0);
 
-        Builder builder = new NotificationCompat.Builder(context);
+        // Notification Builder
+        final Builder builder = new NotificationCompat.Builder(context);
         builder.setContentTitle("Avalanche Risk: " + advisory.rating);
         builder.setTicker("Avalanche Risk: " + advisory.rating);
         String details = "[" + advisory.region.regionName + "] ";
@@ -71,11 +79,9 @@ public class Alerter {
             builder.setLights(AvalancheRisk.getColor(advisory.rating), 1200, 8000); // On for 1200ms, off for 8000ms
         builder.setContentIntent(openAdvisory);
         //builder.setLargeIcon(aBitmap);
+        final Notification noti = builder.build();
 
-        Notification noti = builder.build();
-
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        
+        final NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(Regions.indexOf(advisory.region.regionName), noti);
     }
 
@@ -126,7 +132,7 @@ public class Alerter {
                     new AsyncTask<Void, Void, Void>() {
                         @Override
                         protected Void doInBackground(Void... params) {
-                            ServerUtilities.register(context, regId);
+                            PushServerUtilities.register(context, regId);
                             return null;
                         }
                     }.execute();

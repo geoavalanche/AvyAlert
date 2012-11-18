@@ -1,4 +1,4 @@
-package com.platypii.avyalert;
+package com.platypii.avyalert.data;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -8,8 +8,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.util.Log;
+import com.platypii.avyalert.AvalancheRisk;
 import com.platypii.avyalert.AvalancheRisk.Rating;
-import com.platypii.avyalert.regions.Region;
 
 
 /**

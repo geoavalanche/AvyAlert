@@ -1,11 +1,10 @@
-package com.platypii.avyalert.regions;
+package com.platypii.avyalert.data;
 
 import java.io.IOException;
 import java.util.Locale;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import android.util.Log;
-import com.platypii.avyalert.Advisory;
 import com.platypii.avyalert.R;
 import com.platypii.avyalert.AvalancheRisk.Rating;
 

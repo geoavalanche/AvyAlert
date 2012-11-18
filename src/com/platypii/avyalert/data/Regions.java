@@ -1,4 +1,4 @@
-package com.platypii.avyalert.regions;
+package com.platypii.avyalert.data;
 
 import java.io.BufferedReader;
 import java.io.IOException;
