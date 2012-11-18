@@ -1,6 +1,8 @@
 package com.platypii.avyalert.data;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -20,6 +22,7 @@ public class Region {
     public String roseSelector;
     public String roseForegroundColor;
     public String roseBackgroundColor;
+    public List<String> imageSelectors;
     public String detailsSelector;
     public double latitude;
     public double longitude;
@@ -45,29 +48,18 @@ public class Region {
         }
         
         // Parse rating
-        Rating rating = Rating.NONE;
-        if(ratingSelector != null && !ratingSelector.equals("")) {
-            String ratingText = doc.select(ratingSelector).html();
-            rating = parseRating(ratingText);
-            if(rating == Rating.NONE)
-                Log.v(regionName, "Failed to parse rating: \""+ratingText+"\"");
-            else
-                Log.v(regionName, "Rating: "+rating);
-        }
+        Rating rating = parseRating(doc, ratingSelector);
         
         // Parse rose
-        String roseUrl = null;
-        if(roseSelector != null && !roseSelector.equals("")) {
-            String roseText = doc.select(roseSelector).html();
-            if(roseText.matches("(?si).*<img\\s.*?src=\".*?\".*?>.*")) {
-                // text contains at least one IMG tag with a SRC attribute in quotes
-                int start = roseText.toLowerCase(Locale.getDefault()).indexOf("src=\"") + 5;
-                int end = roseText.indexOf('"', start);
-                roseUrl = roseText.substring(start, end);
-                roseUrl = roseUrl.replaceAll("[ \t\r\n]*", ""); // Remove whitespace
-                Log.v(regionName, "Rose url: \""+roseUrl+"\"");
-            } else {
-                Log.v(regionName, "Failed to parse rose url: \""+roseText+"\"");
+        String roseUrl = parseImageUrl(doc, roseSelector);
+        
+        // Parse extra images
+        List<String> imageUrls = new ArrayList<String>();
+        if(imageSelectors != null) {
+            for(String imageSelector : imageSelectors) {
+                final String imageUrl = parseImageUrl(doc, imageSelector);
+                if(imageUrl != null)
+                    imageUrls.add(imageUrl);
             }
         }
         
@@ -75,21 +67,44 @@ public class Region {
         String details = null;
         if(detailsSelector != null && !detailsSelector.equals("")) {
             details = doc.select(detailsSelector).html();
+            details = details.replaceAll("(?si)</?(img|a).*?>", ""); // Remove images and links
         }
 
-        return new Advisory(this, date, rating, roseUrl, details);
+        return new Advisory(this, date, rating, roseUrl, imageUrls, details);
     }
 
-    private static Rating parseRating(String str) {
-        if(str.matches("(?si).*Extreme.*")) return Rating.EXTREME;
-        else if(str.matches("(?si).*High.*")) return Rating.HIGH;
-        else if(str.matches("(?si).*Considerable.*")) return Rating.CONSIDERABLE;
-        else if(str.matches("(?si).*Moderate.*")) return Rating.MODERATE;
-        else if(str.matches("(?si).*Low.*")) return Rating.LOW;
-        else {
-            Log.d("Region", "Unable to parse rating from: \"" + str + "\"");
-            return Rating.NONE;
+    private Rating parseRating(Document doc, String selector) {
+        if(selector != null && !selector.equals("")) {
+            String html = doc.select(selector).html();
+            if(html.matches("(?si).*Extreme.*")) return Rating.EXTREME;
+            else if(html.matches("(?si).*High.*")) return Rating.HIGH;
+            else if(html.matches("(?si).*Considerable.*")) return Rating.CONSIDERABLE;
+            else if(html.matches("(?si).*Moderate.*")) return Rating.MODERATE;
+            else if(html.matches("(?si).*Low.*")) return Rating.LOW;
+            else {
+                Log.d(regionName, "Unable to parse rating from: \"" + html + "\"");
+            }
         }
+        return Rating.NONE;
+    }
+    
+    private String parseImageUrl(Document doc, String selector) {
+        String imageUrl = null;
+        if(selector != null && !selector.equals("")) {
+            String html = doc.select(roseSelector).html();
+            if(html.matches("(?si).*<img\\s.*?src=\".*?\".*?>.*")) {
+                // text contains at least one IMG tag with a SRC attribute in quotes
+                int start = html.toLowerCase(Locale.getDefault()).indexOf("src=\"") + 5;
+                int end = html.indexOf('"', start);
+                imageUrl = html.substring(start, end);
+                imageUrl = imageUrl.replaceAll("[ \t\r\n]*", ""); // Remove whitespace
+                Log.v(regionName, "image url: \""+imageUrl+"\"");
+                return imageUrl;
+            } else {
+                Log.v(regionName, "Failed to parse url: \""+html+"\"");
+            }
+        }
+        return null;
     }
     
     /**
@@ -97,13 +112,13 @@ public class Region {
      */
     public int getBannerImage() {
         // TODO: Use bannerUrl
-        if(regionName.equals("Eastern Sierra"))
+        if(regionName.equals("Eastern Sierra, CA"))
             return R.drawable.easternsierra;
-        if(regionName.equals("Lake Tahoe"))
+        if(regionName.equals("Lake Tahoe, CA"))
             return R.drawable.tahoe;
-        if(regionName.equals("Mount Shasta"))
+        if(regionName.equals("Mount Shasta, CA"))
             return R.drawable.shasta;
-        if(regionName.equals("Los Angeles"))
+        if(regionName.equals("Los Angeles, CA"))
             return R.drawable.la;
         else
             return 0;

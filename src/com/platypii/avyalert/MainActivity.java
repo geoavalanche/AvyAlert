@@ -2,7 +2,6 @@ package com.platypii.avyalert;
 
 import java.io.IOException;
 import com.platypii.avyalert.R;
-import com.platypii.avyalert.AvalancheRisk.Rating;
 import com.platypii.avyalert.data.Advisory;
 import com.platypii.avyalert.data.Region;
 import com.platypii.avyalert.data.Regions;
@@ -18,14 +17,14 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -41,6 +40,7 @@ public class MainActivity extends Activity {
 
     // Views
     private ScrollView scrollView;
+    private RelativeLayout mainPanel;
     
     // Region (banner)
     private ImageView regionView;
@@ -50,11 +50,9 @@ public class MainActivity extends Activity {
     private TextView ratingLabel;
     private TextView dateLabel;
     private ImageView roseView;
+    private LinearLayout imagePanel;
     private TextView detailsLabel;
-
-    // Link
     private View advisoryLink;
-    private TextView centerLabel;
     
     // Overlays
     private int runningTasks = 0; // Number of AsyncTasks running the background
@@ -62,6 +60,7 @@ public class MainActivity extends Activity {
     private View refreshView;
     
     private SharedPreferences sharedPrefs;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -76,14 +75,15 @@ public class MainActivity extends Activity {
 
         // Find views
         scrollView = (ScrollView) findViewById(R.id.scrollView);
+        mainPanel = (RelativeLayout) findViewById(R.id.mainPanel);
         regionView = (ImageView) findViewById(R.id.regionView);
         dateLabel = (TextView) findViewById(R.id.dateLabel);
         ratingIcon = (ImageView) findViewById(R.id.ratingIcon);
         ratingLabel = (TextView) findViewById(R.id.ratingLabel);
         roseView = (ImageView) findViewById(R.id.roseView);
+        imagePanel = (LinearLayout) findViewById(R.id.imagePanel);
         detailsLabel = (TextView) findViewById(R.id.detailsLabel);
         advisoryLink = findViewById(R.id.advisoryLink);
-        centerLabel = (TextView) findViewById(R.id.centerLabel);
         loadingIcon = (ProgressBar) findViewById(R.id.loadingIcon);
         refreshView = findViewById(R.id.refreshView);
 
@@ -98,17 +98,18 @@ public class MainActivity extends Activity {
         Intent intent = getIntent();
         if(intent != null && intent.hasExtra("com.platypii.avyalert.currrentRegion")) {
             String regionName = intent.getStringExtra("com.platypii.avyalert.currentRegion");
-            currentRegion = Regions.getRegion(regionName);
+            setCurrentRegion(regionName);
             Log.v("Main", "Opening main activity with region: " + regionName);
         }
         if(currentRegion == null) {
             // Load region from preferences
             String regionName = sharedPrefs.getString("currentRegion", null);
-            currentRegion = Regions.getRegion(regionName);
-            currentAdvisory = null;
+            setCurrentRegion(regionName);
         }
-        updateRegion();
-        updateAdvisory();
+        if(currentRegion != null && currentAdvisory != null) {
+            // Region and advisory still exist from previous MainActivity instance
+            setAdvisory(currentAdvisory);
+        }
 
         if(currentRegion == null) {
             // Show region dialog
@@ -134,7 +135,7 @@ public class MainActivity extends Activity {
         Log.v("Main", "Main.onNewIntent("+intent+")");
         if(intent != null) {
             String regionName = intent.getStringExtra("com.platypii.avyalert.currentRegion");
-            currentRegion = Regions.getRegion(regionName);
+            setCurrentRegion(regionName);
             Log.v("Main", "Changing main activity to region: " + regionName);
         }
     }
@@ -151,8 +152,7 @@ public class MainActivity extends Activity {
                     currentRegion = Regions.getRegion(currentRegion.regionName);
                     if(currentRegion == null) {
                         // Current region no long exists
-                        currentAdvisory = null;
-                        updateAdvisory();
+                        setAdvisory(null);
                         showRegionDialog();
                     } else {
                         // Fetch new advisory
@@ -205,15 +205,13 @@ public class MainActivity extends Activity {
         if(newRegion == null) {
             Log.w("RegionDialog", "Null region, wtf?");
             currentRegion = null;
-            currentAdvisory = null;
             updateRegion();
-            updateAdvisory();
-        } else if(currentRegion == null || !currentRegion.regionName.equals(newRegion.regionName)) {
+            setAdvisory(null);
+        } else if(currentRegion == null || !currentRegion.equals(newRegion)) {
             // Change region
             currentRegion = newRegion;
-            currentAdvisory = null;
             updateRegion();
-            updateAdvisory();
+            setAdvisory(null);
             // Fetch new Advisory
             fetchAdvisory();
         } else {
@@ -244,10 +242,8 @@ public class MainActivity extends Activity {
             regionView.setImageResource(currentRegion.getBannerImage());
             regionView.setContentDescription(currentRegion.regionName);
             regionView.setVisibility(View.VISIBLE);
-            centerLabel.setText("from " + currentRegion.centerName);
         } else {
             regionView.setVisibility(View.GONE);
-            advisoryLink.setVisibility(View.GONE);
         }
     }
 
@@ -278,8 +274,7 @@ public class MainActivity extends Activity {
                         // Failed to load any advisory, show refresh button
                         refreshView.setVisibility(View.VISIBLE);
                     } else if(advisory != null && advisory.region.equals(currentRegion)) {
-                        currentAdvisory = advisory;
-                        updateAdvisory();
+                        setAdvisory(advisory);
                     }
                     runningTasks--;
                     if(runningTasks == 0)
@@ -295,68 +290,32 @@ public class MainActivity extends Activity {
     /**
      * Loads an advisory into the current view
      */
-    private void updateAdvisory() {
-        if(currentAdvisory != null) {
-            ratingLabel.setBackgroundColor(AvalancheRisk.getBackgroundColor(currentAdvisory.rating));
-            if(currentAdvisory.rating != Rating.NONE) {
-                ratingIcon.setImageResource(AvalancheRisk.getImage(currentAdvisory.rating));
-                ratingLabel.setText(currentAdvisory.rating.toString());
-                ratingLabel.setTextColor(AvalancheRisk.getForegroundColor(currentAdvisory.rating));
-                ratingIcon.setVisibility(View.VISIBLE);
-                ratingLabel.setVisibility(View.VISIBLE);
-            } else {
-                ratingIcon.setVisibility(View.GONE);
-                ratingLabel.setVisibility(View.GONE);
-            }
-            if(currentAdvisory.date == null || currentAdvisory.date.equals("")) {
-                dateLabel.setVisibility(View.GONE);
-            } else {
-                dateLabel.setText("Date: " + currentAdvisory.date);
-                dateLabel.setVisibility(View.VISIBLE);
-            }
-            roseView.setVisibility(View.GONE); // Hide for now, show when image is downloaded
-            if(currentAdvisory.roseUrl != null && !currentAdvisory.roseUrl.equals("")) {
-                final String roseUrl = currentAdvisory.roseUrl;
-                // Asynchronously get image
-                new AsyncTask<Void,Void,Bitmap>() {
-                    @Override
-                    protected Bitmap doInBackground(Void... params) {
-                        return currentAdvisory.fetchImage();
-                    }
-                    @Override
-                    protected void onPostExecute(Bitmap result) {
-                        if(currentAdvisory != null && roseUrl.equals(currentAdvisory.roseUrl)) {
-                            // Advisory hasn't changed since we started fetching, so show the rose
-                            roseView.setImageBitmap(result);
-                            roseView.setVisibility(View.VISIBLE);
-                        }
-                    }
-                }.execute();
-            }
-            // Details
-            String html = cleanHtml(currentAdvisory.details);
-            detailsLabel.setText(Html.fromHtml(html));
-            detailsLabel.setVisibility(View.VISIBLE);
-            // Link
-            advisoryLink.setVisibility(View.VISIBLE);
-        } else {
+    private void setAdvisory(Advisory advisory) {
+        if(currentAdvisory != null && !currentAdvisory.equals(advisory)) {
+            // Detach old advisory
+            currentAdvisory.onDetach();
+        }
+        if(advisory == null) {
+            // Clear the advisory
+            currentAdvisory = null;
+            dateLabel.setVisibility(View.GONE);
             ratingIcon.setVisibility(View.GONE);
             ratingLabel.setVisibility(View.GONE);
-            dateLabel.setVisibility(View.GONE);
             roseView.setVisibility(View.GONE);
-            detailsLabel.setVisibility(View.GONE);
+            imagePanel.setVisibility(View.GONE);
+            detailsLabel.setText("");
             advisoryLink.setVisibility(View.GONE);
+        } else if(!advisory.equals(currentAdvisory)) {
+            // Attach new advisory
+            currentAdvisory = advisory;
+            currentAdvisory.onAttach(mainPanel);
+        } else {
+            Log.v("Main", "Loaded same advisory into view");
+//            currentAdvisory = advisory;
+//            currentAdvisory.updateView(mainPanel);
         }
     }
     
-    /**
-     * Removes img tags, anchor tags, etc
-     */
-    private static String cleanHtml(String details) {
-        details = details.replaceAll("(?si)</?(img|a).*?>", ""); // Remove images and links
-        return details;
-    }
-
     // Listeners
     private View.OnClickListener regionListener = new View.OnClickListener() {
         @Override
@@ -436,6 +395,11 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
         if(regionDialog != null) {
             regionDialog.cancel();
+            regionDialog = null;
+        }
+        if(currentAdvisory != null) {
+            currentAdvisory.onDetach();
+            currentAdvisory = null;
         }
         // TODO: Stop AsyncTasks?
         // GCMRegistrar.onDestroy(this);
