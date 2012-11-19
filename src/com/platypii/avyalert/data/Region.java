@@ -122,6 +122,7 @@ public class Region {
         else if(regionName.equals("Lake Tahoe, CA")) bannerView.setImageResource(R.drawable.banner_tahoe);
         else if(regionName.equals("Mount Shasta, CA")) bannerView.setImageResource(R.drawable.banner_shasta);
         else if(regionName.equals("Bozeman, MT")) bannerView.setImageResource(R.drawable.banner_bozeman);
+        else if(regionName.equals("Mount Rainier, WA")) bannerView.setImageResource(R.drawable.banner_rainier);
         else if(regionName.equals("Mt Washington, NH")) bannerView.setImageResource(R.drawable.banner_tuckerman);
         else if(regionName.equals("Los Angeles, CA")) bannerView.setImageResource(R.drawable.banner_la);
         else {

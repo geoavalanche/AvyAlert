@@ -139,9 +139,8 @@ public class MainActivity extends Activity {
                     Log.v("Main", "New region data!");
                     currentRegion = (currentRegion == null)? null : Regions.getRegion(currentRegion.regionName);
                     if(currentRegion == null) {
-                        // Current region no long exists
+                        // Current region no longer exists
                         setCurrentRegion(null);
-                        showRegionDialog();
                     } else {
                         // Fetch new advisory
                         fetchAdvisory();
@@ -229,6 +228,7 @@ public class MainActivity extends Activity {
                 actionBar.setSubtitle(currentRegion.regionName);
             }
             final String currentRegionName = currentRegion.regionName; // The name of the region being fetched 
+            regionView.setVisibility(View.GONE);
             currentRegion.fetchBannerImage(regionView, new Callback<Bitmap>() {
                 @Override
                 public void callback(Bitmap result) {
