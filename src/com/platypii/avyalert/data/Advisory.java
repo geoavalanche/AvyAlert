@@ -99,7 +99,7 @@ public class Advisory {
         detailsLabel.setText(Html.fromHtml(details));
         detailsLabel.setVisibility(View.VISIBLE);
         // Link
-        centerLabel.setText("from " + region.regionName);
+        centerLabel.setText("from " + region.centerName);
         advisoryLink.setVisibility(View.VISIBLE);
     }
     

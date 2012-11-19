@@ -1,138 +1,142 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+	android:id="@+id/scrollView"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:fillViewport="true" >
 
-   	<ProgressBar
-		android:id="@+id/loadingIcon"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_gravity="center"
-		android:indeterminate="true"
-		android:visibility="gone" />
-
-   	<ScrollView
-		android:id="@+id/scrollView"
+	<LinearLayout
+		android:id="@+id/mainPanel"
 		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:fillViewport="true" >
+		android:layout_height="wrap_content"
+		android:orientation="vertical" >
 
-		<RelativeLayout
-			android:id="@+id/mainPanel"
+		<ImageView
+		    android:id="@+id/regionView"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:adjustViewBounds="true"
+		    android:contentDescription="Avalanche Region"
+		    android:padding="0dp" />
+		
+		<FrameLayout 
 			android:layout_width="match_parent"
-			android:layout_height="wrap_content" >
+			android:layout_height="0dip"
+			android:layout_weight="1" >
 
-		    <ImageView
-		        android:id="@+id/regionView"
-		        android:layout_width="match_parent"
-		        android:layout_height="wrap_content"
-		        android:layout_alignParentTop="true"
-		        android:adjustViewBounds="true"
-		        android:contentDescription="Avalanche Region"
-		        android:padding="0dp" />
-
-   		    <ImageView
-		        android:id="@+id/ratingIcon"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-	            android:layout_below="@+id/regionView"
-	            android:layout_alignParentLeft="true"
-		        android:adjustViewBounds="true"
-		        android:contentDescription="Danger Rating"
-		        android:padding="0dp" />
-
-	        <TextView
-	            android:id="@+id/ratingLabel"
-	            style="@android:style/TextAppearance.Large"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:layout_marginBottom="4dp"
-	            android:layout_below="@+id/regionView"
-	            android:layout_alignParentRight="true"
-	            android:layout_alignBaseline="@+id/ratingIcon"
-	            android:paddingRight="4dp"
-	            android:paddingLeft="4dp"
-	            android:textSize="15pt"
-	            android:text="" />
-
-		    <TextView
-		        android:id="@+id/dateLabel"
-		        android:layout_width="match_parent"
-		        android:layout_height="wrap_content"
-		        android:layout_below="@+id/ratingLabel"
-		        android:padding="2dp"
-		        android:text="" />
-		    
-		    <ImageView
-				android:id="@+id/roseView"
+			<RelativeLayout
+				android:id="@+id/advisoryPanel"
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_below="@+id/dateLabel"
-				android:padding="0dp"
-		        android:scaleType="centerInside"
-		        android:adjustViewBounds="true"
-		        android:contentDescription="Danger Rose"
-				android:visibility="gone" />
+				android:layout_height="match_parent" >
 
-		    <LinearLayout
-				android:id="@+id/imagePanel"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_below="@+id/roseView"
-				android:padding="0dp"
-				android:orientation="vertical"
-				android:visibility="gone" />
-
-			<TextView
-		        android:id="@+id/detailsLabel"
-		        android:layout_width="match_parent"
-		        android:layout_height="wrap_content"
-		        android:layout_below="@+id/imagePanel"
-		        android:padding="2dp"
-		        android:text="" />
-
-			<LinearLayout
-				android:id="@+id/advisoryLink"
-				android:background="@drawable/link"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_below="@+id/detailsLabel"
-				android:layout_alignParentBottom="true"
-				android:layout_marginTop="8dp"
-				android:layout_marginBottom="2dp"
-				android:padding="3dp"
-				android:orientation="vertical"
-				android:visibility="gone" >
-					    
-				<TextView
-					android:id="@+id/linkLabel"
-					style="@android:style/TextAppearance.Large"
+	   		    <ImageView
+			        android:id="@+id/ratingIcon"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+				    android:layout_alignParentTop="true"
+		            android:layout_alignParentLeft="true"
+			        android:adjustViewBounds="true"
+			        android:contentDescription="Danger Rating"
+			        android:padding="0dp" />
+	
+		        <TextView
+		            android:id="@+id/ratingLabel"
+		            style="@android:style/TextAppearance.Large"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_marginBottom="4dp"
+				    android:layout_alignParentTop="true"
+		            android:layout_alignParentRight="true"
+		            android:layout_alignBaseline="@+id/ratingIcon"
+		            android:paddingRight="4dp"
+		            android:paddingLeft="4dp"
+		            android:textSize="15pt"
+		            android:text="" />
+	
+			    <TextView
+			        android:id="@+id/dateLabel"
+			        android:layout_width="match_parent"
+			        android:layout_height="wrap_content"
+			        android:layout_below="@+id/ratingLabel"
+			        android:padding="2dp"
+			        android:text="" />
+			    
+			    <ImageView
+					android:id="@+id/roseView"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:text="View Advisory" />
-				
-				<TextView
-					android:id="@+id/centerLabel"
+					android:layout_below="@+id/dateLabel"
+					android:padding="0dp"
+			        android:scaleType="centerInside"
+			        android:adjustViewBounds="true"
+			        android:contentDescription="Danger Rose"
+					android:visibility="gone" />
+	
+			    <LinearLayout
+					android:id="@+id/imagePanel"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:text="" />
-			
-			</LinearLayout>
-			
+					android:layout_below="@+id/roseView"
+					android:padding="0dp"
+					android:orientation="vertical"
+					android:visibility="gone" />
+	
+				<TextView
+			        android:id="@+id/detailsLabel"
+			        android:layout_width="match_parent"
+			        android:layout_height="wrap_content"
+			        android:layout_below="@+id/imagePanel"
+					android:layout_alignParentBottom="true"
+			        android:padding="2dp"
+			        android:text="" />
+	
+			</RelativeLayout>
+
 			<View
 				android:id="@+id/refreshView"
 				android:background="@drawable/refresh"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_below="@+id/regionView"
-				android:layout_alignParentBottom="true"
-				android:layout_alignParentLeft="true"
-				android:layout_alignParentRight="true"
-				android:layout_alignWithParentIfMissing="true"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
 				android:visibility="gone" />
 
-		</RelativeLayout>
+		   	<ProgressBar
+				android:id="@+id/loadingIcon"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				android:indeterminate="true"
+				android:visibility="gone" />
+
+		</FrameLayout>
+
+		<LinearLayout
+			android:id="@+id/advisoryLink"
+			android:background="@drawable/link"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_below="@+id/detailsLabel"
+			android:layout_alignParentBottom="true"
+			android:layout_marginTop="8dp"
+			android:layout_marginBottom="2dp"
+			android:padding="3dp"
+			android:orientation="vertical"
+			android:visibility="gone" >
+				    
+			<TextView
+				android:id="@+id/linkLabel"
+				style="@android:style/TextAppearance.Large"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="View Advisory" />
+			
+			<TextView
+				android:id="@+id/centerLabel"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="" />
 		
-	</ScrollView>
-	
-</FrameLayout>
+		</LinearLayout>
+
+	</LinearLayout>
+				
+</ScrollView>

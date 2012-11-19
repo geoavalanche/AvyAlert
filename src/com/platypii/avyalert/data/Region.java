@@ -112,14 +112,11 @@ public class Region {
      */
     public int getBannerImage() {
         // TODO: Use bannerUrl
-        if(regionName.equals("Eastern Sierra, CA"))
-            return R.drawable.easternsierra;
-        if(regionName.equals("Lake Tahoe, CA"))
-            return R.drawable.tahoe;
-        if(regionName.equals("Mount Shasta, CA"))
-            return R.drawable.shasta;
-        if(regionName.equals("Los Angeles, CA"))
-            return R.drawable.la;
+        if(regionName.equals("Eastern Sierra, CA")) return R.drawable.easternsierra;
+        if(regionName.equals("Lake Tahoe, CA")) return R.drawable.tahoe;
+        if(regionName.equals("Mount Shasta, CA")) return R.drawable.shasta;
+        if(regionName.equals("Bozeman, MT")) return R.drawable.bozeman;
+        if(regionName.equals("Los Angeles, CA")) return R.drawable.la;
         else
             return 0;
     }

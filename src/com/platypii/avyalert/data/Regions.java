@@ -75,7 +75,7 @@ public class Regions {
      * Fetches new region data from the internet
      * @param callback callback to notify of new region data
      */
-    public static void fetchRegionData(final SharedPreferences prefs, final Callback<Void> callback) {
+    public static void fetchRegionData(final SharedPreferences prefs, final Callback<Boolean> callback) {
         Log.v("Regions", "Fetching region data: " + regionDataUrl);
         new AsyncTask<Void, Void, String>() {
             @Override
@@ -127,9 +127,9 @@ public class Regions {
                     final SharedPreferences.Editor prefsEditor = prefs.edit();
                     prefsEditor.putString("regionData", regionData);
                     prefsEditor.commit();
-                    // Callback only if region data changed
-                    callback.callback(null);
+                    callback.callback(true);
                 }
+                callback.callback(false); // Region data unchanged
             }
         }.execute();
     }
