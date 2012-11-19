@@ -6,7 +6,11 @@ import java.util.List;
 import java.util.Locale;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import android.graphics.Bitmap;
 import android.util.Log;
+import android.widget.ImageView;
+import com.platypii.avyalert.Callback;
+import com.platypii.avyalert.Images;
 import com.platypii.avyalert.R;
 import com.platypii.avyalert.AvalancheRisk.Rating;
 
@@ -67,7 +71,8 @@ public class Region {
         String details = null;
         if(detailsSelector != null && !detailsSelector.equals("")) {
             details = doc.select(detailsSelector).html();
-            details = details.replaceAll("(?si)</?(img|a).*?>", ""); // Remove images and links
+            details = details.replaceAll("(?si)</?(img|a).*?>", ""); // Remove image and link tags
+            details = details.replaceAll("<(?s)!\\[CDATA\\[.*?\\]\\]>", ""); // Remove CDATA blocks
         }
 
         return new Advisory(this, date, rating, roseUrl, imageUrls, details);
@@ -108,17 +113,21 @@ public class Region {
     }
     
     /**
-     * Returns the resource id of the banner for this region 
+     * Loads the banner into the given view immediately if it can.
+     * Will start an AsyncTask to download othewise, and will then callback
+     * @param callback called if there is a Bitmap that needs to be loaded
      */
-    public int getBannerImage() {
-        // TODO: Use bannerUrl
-        if(regionName.equals("Eastern Sierra, CA")) return R.drawable.easternsierra;
-        if(regionName.equals("Lake Tahoe, CA")) return R.drawable.tahoe;
-        if(regionName.equals("Mount Shasta, CA")) return R.drawable.shasta;
-        if(regionName.equals("Bozeman, MT")) return R.drawable.bozeman;
-        if(regionName.equals("Los Angeles, CA")) return R.drawable.la;
-        else
-            return 0;
+    public void fetchBannerImage(ImageView bannerView, final Callback<Bitmap> callback) {
+        if(regionName.equals("Eastern Sierra, CA")) bannerView.setImageResource(R.drawable.banner_easternsierra);
+        else if(regionName.equals("Lake Tahoe, CA")) bannerView.setImageResource(R.drawable.banner_tahoe);
+        else if(regionName.equals("Mount Shasta, CA")) bannerView.setImageResource(R.drawable.banner_shasta);
+        else if(regionName.equals("Bozeman, MT")) bannerView.setImageResource(R.drawable.banner_bozeman);
+        else if(regionName.equals("Mt Washington, NH")) bannerView.setImageResource(R.drawable.banner_tuckerman);
+        else if(regionName.equals("Los Angeles, CA")) bannerView.setImageResource(R.drawable.banner_la);
+        else {
+            // Download from bannerUrl
+            Images.fetchCachedBitmapAsync(bannerUrl, callback);
+        }
     }
     
     @Override

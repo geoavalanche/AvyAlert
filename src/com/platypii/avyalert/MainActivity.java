@@ -17,6 +17,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -227,7 +228,15 @@ public class MainActivity extends Activity {
                 ActionBar actionBar = getActionBar();
                 actionBar.setSubtitle(currentRegion.regionName);
             }
-            regionView.setImageResource(currentRegion.getBannerImage());
+            final String currentRegionName = currentRegion.regionName; // The name of the region being fetched 
+            currentRegion.fetchBannerImage(regionView, new Callback<Bitmap>() {
+                @Override
+                public void callback(Bitmap result) {
+                    // If the region hasn't changed since we started, load the image
+                    if(currentRegionName.equals(currentRegion.regionName))
+                        regionView.setImageBitmap(result);
+                }
+            });
             regionView.setContentDescription(currentRegion.regionName);
             regionView.setVisibility(View.VISIBLE);
         } else {
@@ -291,7 +300,7 @@ public class MainActivity extends Activity {
         } else if(!advisory.equals(currentAdvisory)) {
             // Attach new advisory
             currentAdvisory = advisory;
-            currentAdvisory.onAttach(mainPanel);
+            currentAdvisory.onAttach(this, mainPanel);
             advisoryPanel.setVisibility(View.VISIBLE);
         } else {
             Log.v("Main", "Loaded same advisory into view");
