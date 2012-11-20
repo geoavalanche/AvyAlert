@@ -48,6 +48,7 @@ public class Region {
         String date = null;
         if(dateSelector != null && !dateSelector.equals("")) {
             date = doc.select(dateSelector).text();
+            date = date.replaceAll("[ \t\r\n]+", " "); // Remove redundant whitespace
             Log.v(regionName, "Date text: \""+date+"\"");
         }
         
@@ -72,7 +73,8 @@ public class Region {
         if(detailsSelector != null && !detailsSelector.equals("")) {
             details = doc.select(detailsSelector).html();
             details = details.replaceAll("(?si)</?(img|a).*?>", ""); // Remove image and link tags
-            details = details.replaceAll("<(?s)!\\[CDATA\\[.*?\\]\\]>", ""); // Remove CDATA blocks
+            details = details.replaceAll("(?si)<script.*?>.*?</script>", ""); // Remove scripts
+            details = details.replaceAll("(?s)<!\\[CDATA\\[.*?\\]\\]>", ""); // Remove CDATA blocks
         }
 
         return new Advisory(this, date, rating, roseUrl, imageUrls, details);
@@ -123,8 +125,8 @@ public class Region {
         else if(regionName.equals("Mount Shasta, CA")) bannerView.setImageResource(R.drawable.banner_shasta);
         else if(regionName.equals("Bozeman, MT")) bannerView.setImageResource(R.drawable.banner_bozeman);
         else if(regionName.equals("Mount Rainier, WA")) bannerView.setImageResource(R.drawable.banner_rainier);
+        else if(regionName.equals("Tetons, WY")) bannerView.setImageResource(R.drawable.banner_tetons);
         else if(regionName.equals("Mt Washington, NH")) bannerView.setImageResource(R.drawable.banner_tuckerman);
-        else if(regionName.equals("Los Angeles, CA")) bannerView.setImageResource(R.drawable.banner_la);
         else {
             // Download from bannerUrl
             Images.fetchCachedBitmapAsync(bannerUrl, callback);
