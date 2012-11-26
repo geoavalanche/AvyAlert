@@ -8,42 +8,6 @@
 	<string name="danger4">"Natural and human triggered avalanches likely.  Unstable slabs likely on a variety of aspects and slope angles.  Travel in avalanche terrain is not recommended. Safest travel on windward ridges of lower angle slopes without steeper terrain above.</string>
 	<string name="danger5">"Widespread natural or human triggered avalanches certain.  Extremely unstable slabs certain on most aspects and slope angles. Large destructive avalanches possible.  Travel in avalanche terrain should be avoided and travel confined to low angle terrain well away from avalanche path run-outs.</string>
 
-    <string name="default_region_data" formatted="true">
-[
- {	\"regionName\": \"Eastern Sierra\",
-	\"centerName\": \"Eastern Sierra Avalanche Center\",
-	\"bannerUrl\": \"http://platypiiindustries.com/AvyAlert/regions/easternsierra.jpg\",
-	\"advisoryUrl\": \"http://esavalanche.org/advisory\",
-	\"dateSelector\": \"div.forecast-advisory strong:eq(0)\",
-	\"ratingSelector\": \"div.forecast-advisory .rating div:eq(0)\",
-	\"roseSelector\": \"\",
-	\"detailsSelector\": \"div.forecast-advisory\",
-	\"latitude\": 37.630628,
-	\"longitude\": -119.032625 },
-
- {	\"regionName\": \"Lake Tahoe\",
-	\"centerName\": \"Sierra Avalanche Center\",
-	\"bannerUrl\": \"http://platypiiindustries.com/AvyAlert/regions/laketahoe.jpg\",
-	\"advisoryUrl\": \"http://sierraavalanchecenter.org/advisory\",
-	\"dateSelector\": \"div.content table strong:eq(0)\",
-	\"ratingSelector\": \"div.content table a[href=http://avalanche.org/danger_card.php]\",
-	\"roseSelector\": \"div.content table a[href=http://avalanche.state.co.us/pub/fx_danger_rose.php]\",
-	\"detailsSelector\": \"div.content table\",
-	\"latitude\": 39.091667,
-	\"longitude\": -120.041667 },
-
- {	\"regionName\": \"Mount Shasta\",
-	\"centerName\": \"Mount Shasta Avalanche Center\",
-	\"bannerUrl\": \"http://platypiiindustries.com/AvyAlert/regions/shasta.jpg\",
-	\"advisoryUrl\": \"http://shastaavalanche.org/advisories/advisories/avalanche-advisory\",
-	\"dateSelector\": \"table.contentpaneopen strong\",
-	\"ratingSelector\": \"table.contentpaneopen .rating div\",
-	\"roseSelector\": \"\",
-	\"detailsSelector\": \"table.contentpaneopen\",
-	\"latitude\": 41.409196,
-	\"longitude\": -122.194888 }
-  ]
-	</string>
     
 	<!-- In-App Billing -->
 	<string name="billing_not_supported_title">Can\'t make purchases</string>

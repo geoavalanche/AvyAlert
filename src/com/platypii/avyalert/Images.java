@@ -7,7 +7,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.net.URLConnection;
+import java.security.GeneralSecurityException;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -16,7 +20,6 @@ import android.util.Log;
 
 /**
  * Class for fetching images from the web
- * TODO: Cache the images
  * @author platypii
  */
 public class Images {
@@ -38,38 +41,33 @@ public class Images {
         Images.cacheDir = cacheDir;
     }
 
-    /**
-     * Downloads a bitmap. Synchronous (will block).
-     */
-    public static Bitmap fetchBitmap(String url) {
+    /** Downloads a bitmap. Synchronous (will block). */
+    public static Bitmap fetchBitmap(URL imageUrl) {
         Bitmap bmp = null;
+        InputStream is = null;
         try {
-            URLConnection conn = new URL(url).openConnection();
-            conn.connect();
-            InputStream is = conn.getInputStream();
-            bmp = BitmapFactory.decodeStream(is);
-            is.close();
+            is = getInputStream(imageUrl);
+            if(is != null) {
+                bmp = BitmapFactory.decodeStream(is);
+                is.close();
+            }
         } catch(IOException e) {
             Log.i("Main", "Error getting bitmap", e);
         }
         return bmp;
     }
     
-    /**
-     * Retrieves an image from the cache if available, otherwise fetches it and stores it in the cache
-     */
-    public static Bitmap fetchCachedBitmap(String url) {
+    /** Retrieves an image from the cache if available, otherwise fetches it and stores it in the cache */
+    public static Bitmap fetchCachedBitmap(URL url) {
         if(cacheDir == null) {
             // No cache
             return fetchBitmap(url);
         }
-        File file = new File(cacheDir, filenameOf(url));
+        File file = new File(cacheDir, filenameOf(url.toString()));
         try {
             if(!file.exists()) {
                 // Download to cache
-                URLConnection conn = new URL(url).openConnection();
-                conn.connect();
-                InputStream is = conn.getInputStream();
+                InputStream is = getInputStream(url);
                 OutputStream os = new FileOutputStream(file);
                 // Copy input stream to file
                 byte[] buffer = new byte[1024];
@@ -88,6 +86,29 @@ public class Images {
             return bmp;
         } catch(IOException e) {
             Log.i("Main", "Error getting bitmap", e);
+            return null;
+        }
+    }
+    
+    /** Gets an InputStream for a given url */
+    public static InputStream getInputStream(URL imageUrl) {
+        try {
+            if(imageUrl.toString().matches("^https:\\/\\/.*")) {
+                // allow any/all https certificates
+                try {
+                    SSLContext sc = SSLContext.getInstance("SSL");
+                    sc.init(null, trustAllCerts, new java.security.SecureRandom());
+                    HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+                } catch(GeneralSecurityException e) {
+                    Log.i("Main", "Error setting TrsutManager", e);
+                }
+                // Connect to https
+                return imageUrl.openStream();
+            } else {
+                return imageUrl.openStream();
+            }
+        } catch(IOException e) {
+            Log.i("Main", "Error getting InputStream for URL", e);
             return null;
         }
     }
@@ -127,12 +148,12 @@ public class Images {
     /**
      * Just like fetchBitmap, but with a callback instead of blocking
      */
-    public static void fetchBitmapAsync(final String url, final Callback<Bitmap> callback) {
-        if(url != null && !url.equals("")) {
+    public static void fetchBitmapAsync(final URL imageUrl, final Callback<Bitmap> callback) {
+        if(imageUrl != null && !imageUrl.equals("")) {
             new AsyncTask<Void,Void,Bitmap>() {
                 @Override
                 protected Bitmap doInBackground(Void... params) {
-                    return Images.fetchBitmap(url);
+                    return Images.fetchBitmap(imageUrl);
                 }
                 @Override
                 protected void onPostExecute(Bitmap result) {
@@ -147,7 +168,7 @@ public class Images {
     /**
      * Just like fetchCachedBitmap, but with a callback instead of blocking
      */
-    public static void fetchCachedBitmapAsync(final String url, final Callback<Bitmap> callback) {
+    public static void fetchCachedBitmapAsync(final URL url, final Callback<Bitmap> callback) {
         // TODO: Skip AsyncTask if there is a cache hit?
         if(url != null && !url.equals("")) {
             new AsyncTask<Void,Void,Bitmap>() {
@@ -164,4 +185,18 @@ public class Images {
             callback.callback(null);
         }
     }
+    
+    /** Accept any and all certificates */
+    static TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
+        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+            return null;
+        }
+        public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+            // No need to implement.
+        }
+        public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+            // No need to implement.
+        }
+    }};
+    
 }

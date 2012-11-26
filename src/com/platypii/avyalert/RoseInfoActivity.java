@@ -9,7 +9,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 
-public class InfoActivity extends Activity {
+public class RoseInfoActivity extends Activity {
     
 
     /** Called when the activity is first created. */

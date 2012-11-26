@@ -1,6 +1,8 @@
 package com.platypii.avyalert.data;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -56,13 +58,13 @@ public class Region {
         Rating rating = parseRating(doc, ratingSelector);
         
         // Parse rose
-        String roseUrl = parseImageUrl(doc, roseSelector);
+        URL roseUrl = parseImageUrl(doc, roseSelector);
         
         // Parse extra images
-        List<String> imageUrls = new ArrayList<String>();
+        List<URL> imageUrls = new ArrayList<URL>();
         if(imageSelectors != null) {
             for(String imageSelector : imageSelectors) {
-                final String imageUrl = parseImageUrl(doc, imageSelector);
+                final URL imageUrl = parseImageUrl(doc, imageSelector);
                 if(imageUrl != null)
                     imageUrls.add(imageUrl);
             }
@@ -72,7 +74,7 @@ public class Region {
         String details = null;
         if(detailsSelector != null && !detailsSelector.equals("")) {
             details = doc.select(detailsSelector).html();
-            details = details.replaceAll("(?si)</?(img|a).*?>", ""); // Remove image and link tags
+            // Clean up some of the garbage. Edits related to style (a,img tags) should be removed later by the UI.
             details = details.replaceAll("(?si)<script.*?>.*?</script>", ""); // Remove scripts
             details = details.replaceAll("(?s)<!\\[CDATA\\[.*?\\]\\]>", ""); // Remove CDATA blocks
         }
@@ -95,21 +97,34 @@ public class Region {
         return Rating.NONE;
     }
     
-    private String parseImageUrl(Document doc, String selector) {
-        String imageUrl = null;
-        if(selector != null && !selector.equals("")) {
-            String html = doc.select(roseSelector).html();
-            if(html.matches("(?si).*<img\\s.*?src=\".*?\".*?>.*")) {
-                // text contains at least one IMG tag with a SRC attribute in quotes
-                int start = html.toLowerCase(Locale.getDefault()).indexOf("src=\"") + 5;
-                int end = html.indexOf('"', start);
-                imageUrl = html.substring(start, end);
-                imageUrl = imageUrl.replaceAll("[ \t\r\n]*", ""); // Remove whitespace
-                Log.v(regionName, "image url: \""+imageUrl+"\"");
-                return imageUrl;
-            } else {
-                Log.v(regionName, "Failed to parse url: \""+html+"\"");
+    /** Searches the document for a given selector. From this, return the url to the first img tag's src */
+    private URL parseImageUrl(Document doc, String selector) {
+        String url = null;
+        try {
+            if(selector != null && !selector.equals("")) {
+                String html = doc.select(selector).toString();
+                if(html.matches("(?si).*<img\\s.*?src=\".*?\".*?>.*")) {
+                    // text contains at least one IMG tag with a SRC attribute in quotes
+                    int start = html.toLowerCase(Locale.getDefault()).indexOf("src=\"") + 5;
+                    int end = html.indexOf('"', start);
+                    url = html.substring(start, end);
+                    url = url.replaceAll("[ \t\r\n]*", ""); // Remove whitespace
+                    Log.v(regionName, "image url: \""+url+"\"");
+                    
+                    // Handle relative paths
+                    if(! url.matches("^https?://.*")) {
+                        URL abs = new URL(new URL(advisoryUrl), url);
+                        Log.v(regionName, "absolute image url: " + abs);
+                        return abs;
+                    } else {
+                        return new URL(url);
+                    }
+                } else {
+                    Log.v(regionName, "Failed to parse url: \""+html+"\"");
+                }
             }
+        } catch(MalformedURLException e) {
+            Log.i(regionName, "Malformed url", e);
         }
         return null;
     }
@@ -129,10 +144,22 @@ public class Region {
         else if(regionName.equals("Mt Washington, NH")) bannerView.setImageResource(R.drawable.banner_tuckerman);
         else {
             // Download from bannerUrl
-            Images.fetchCachedBitmapAsync(bannerUrl, callback);
+            Images.fetchCachedBitmapAsync(getURL(bannerUrl), callback);
         }
     }
     
+    /** Returns */
+    private URL getURL(String str) {
+        try {
+            URL url = new URL(str);
+            // TODO: handle relative URLs
+            return url;
+        } catch(MalformedURLException e) {
+            Log.i(regionName, "Malformed url: " + str);
+            return null;
+        }
+    }
+
     @Override
     public boolean equals(Object obj) {
         // Two regions with the same name are the same
