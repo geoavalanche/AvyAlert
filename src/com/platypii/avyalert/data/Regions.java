@@ -89,6 +89,13 @@ public class Regions {
         if(regionData != null) {
             try {
                 regions = new Gson().fromJson(regionData, new TypeToken<List<Region>>(){}.getType());
+                // Create subregions
+                for(Region region : regions) {
+                    if(!subregions.containsKey(region.subregion)) {
+                        subregions.put(region.subregion, new ArrayList<Region>());
+                    }
+                    subregions.get(region.subregion).add(region);
+                }
             } catch(JsonSyntaxException e) {
                 Log.w("Regions", "Failed to parse region data");
                 e.printStackTrace();

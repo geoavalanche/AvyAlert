@@ -35,6 +35,7 @@ public class MainActivity extends Activity {
 
     private static Region currentRegion = null; // The current region
     private static Advisory currentAdvisory = null; // The advisory currently being displayed
+    private AdvisoryView currentAdvisoryViewer = null; // Translates the current advisory into view
 
     // Views
     private ScrollView scrollView;
@@ -290,17 +291,19 @@ public class MainActivity extends Activity {
     private void setCurrentAdvisory(Advisory advisory) {
         if(currentAdvisory != null && !currentAdvisory.equals(advisory)) {
             // Detach old advisory
-            currentAdvisory.onDetach();
+            currentAdvisoryViewer.onDetach();
         }
         if(advisory == null) {
             // Clear the advisory
             currentAdvisory = null;
+            currentAdvisoryViewer = null;
             advisoryPanel.setVisibility(View.GONE);
             advisoryLink.setVisibility(View.GONE);
         } else if(!advisory.equals(currentAdvisory)) {
             // Attach new advisory
             currentAdvisory = advisory;
-            currentAdvisory.onAttach(this, mainPanel);
+            currentAdvisoryViewer = new AdvisoryView(currentAdvisory);
+            currentAdvisoryViewer.onAttach(this, mainPanel);
             advisoryPanel.setVisibility(View.VISIBLE);
         } else {
             Log.v("Main", "Loaded same advisory into view");
@@ -364,10 +367,10 @@ public class MainActivity extends Activity {
 //                fetchAdvisory();
 //                fetchRegionData();
 //                return true;
-//            case R.id.menu_settings:
-//                // Open settings
-//                startActivity(new Intent(this, SettingsActivity.class));
-//                return true;
+            case R.id.menu_settings:
+                // Open settings
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -391,13 +394,16 @@ public class MainActivity extends Activity {
     
     @Override
     protected void onDestroy() {
+        // Cancel region dialog
         if(regionDialog != null) {
             regionDialog.cancel();
             regionDialog = null;
         }
+        // Detach current advisory
         if(currentAdvisory != null) {
-            currentAdvisory.onDetach();
-            currentAdvisory = null;
+            currentAdvisory = null; // Remove current advisory?
+            currentAdvisoryViewer.onDetach();
+            currentAdvisoryViewer = null;
         }
         // TODO: Stop AsyncTasks?
         // GCMRegistrar.onDestroy(this);

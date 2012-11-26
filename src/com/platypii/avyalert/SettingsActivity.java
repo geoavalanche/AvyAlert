@@ -28,24 +28,25 @@ public class SettingsActivity extends PreferenceActivity {
             actionBar.setHomeButtonEnabled(true);
         }
 
-        Preference pushPref = findPreference("enablePush");
-        pushPref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                // TODO: Check subscription status
-                final SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
-                boolean isSubscribed = prefs.getBoolean("isSubscribed", false);
-                if(isSubscribed) {
-                    // Enable
-                    return true;
-                } else {
-                    // Open BillingActivity
-                    startActivity(new Intent(SettingsActivity.this, BillingActivity.class));
-                    // Toast.makeText(SettingsActivity.this, "Push notifications is a paid feature", Toast.LENGTH_SHORT).show();
-                    return false;
+        if(!Debug.DEBUG_NOTIFICATIONS) {
+            findPreference("enablePush").setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    // TODO: Check subscription status
+                    final SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
+                    boolean isSubscribed = prefs.getBoolean("isSubscribed", false);
+                    if(isSubscribed) {
+                        // Enable
+                        return true;
+                    } else {
+                        // Open BillingActivity
+                        startActivity(new Intent(SettingsActivity.this, BillingActivity.class));
+                        // Toast.makeText(SettingsActivity.this, "Push notifications is a paid feature", Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
                 }
-            }
-        });
+            });
+        }
         
         ListPreference regionPref = (ListPreference) findPreference("currentRegion");
         CharSequence regions[] = Regions.getRegionNames();

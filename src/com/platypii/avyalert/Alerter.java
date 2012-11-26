@@ -2,9 +2,10 @@ package com.platypii.avyalert;
 
 import java.util.Calendar;
 import com.google.android.gcm.GCMRegistrar;
-import com.platypii.avyalert.AvalancheRisk.Rating;
 import com.platypii.avyalert.data.Advisory;
+import com.platypii.avyalert.data.AvalancheRisk;
 import com.platypii.avyalert.data.Regions;
+import com.platypii.avyalert.data.AvalancheRisk.Rating;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;

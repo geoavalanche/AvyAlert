@@ -14,12 +14,13 @@ import android.widget.ImageView;
 import com.platypii.avyalert.Callback;
 import com.platypii.avyalert.Images;
 import com.platypii.avyalert.R;
-import com.platypii.avyalert.AvalancheRisk.Rating;
+import com.platypii.avyalert.data.AvalancheRisk.Rating;
 
 
 public class Region {
 
     public String regionName;
+    public String subregion;
     public String centerName;
     public String bannerUrl;
     public String advisoryUrl;
