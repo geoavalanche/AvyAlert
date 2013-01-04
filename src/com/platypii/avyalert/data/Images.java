@@ -9,6 +9,11 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.GeneralSecurityException;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -21,6 +26,11 @@ import android.util.Log;
  */
 public class Images {
     
+    public static final int FG_COLOR = 0xffdddddd;
+    public static final int BG_COLOR = 0x00000000;
+    
+    // private static final int MIN_HEIGHT = 300; // Minimum image height, otherwise scale up
+
     // Image cache directory
     private static File cacheDir = null;
     
@@ -100,6 +110,29 @@ public class Images {
         }
     }
     
+    /** Gets an InputStream for a given url */
+    public static InputStream getInputStream(URL imageUrl) {
+        try {
+            if(imageUrl.toString().matches("^https:\\/\\/.*")) {
+                // allow any/all https certificates
+                try {
+                    SSLContext sc = SSLContext.getInstance("SSL");
+                    sc.init(null, trustAllCerts, new java.security.SecureRandom());
+                    HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+                } catch(GeneralSecurityException e) {
+                    Log.i("Main", "Error setting TrustManager", e);
+                }
+                // Connect to https
+                return imageUrl.openStream();
+            } else {
+                return imageUrl.openStream();
+            }
+        } catch(IOException e) {
+            Log.i("Main", "Error getting InputStream for URL", e);
+            return null;
+        }
+    }
+    
     /**
      * Removes nasty characters from urls and replaces them with dashes for safety
      */
@@ -107,6 +140,31 @@ public class Images {
         return url.replaceAll("[ :\\\\/=\\&@\\?\\.]+", "-");
     }
 
+    /**
+     * Returns a new bitmap in which foreground is replaced by FG_COLOR, and background is replaced by BG_COLOR
+     * @param in
+     * @return
+     */
+    public static Bitmap replaceColor(Bitmap in, int fg, int bg) {
+        if(in == null) return null;
+        Bitmap out = Bitmap.createBitmap(in.getWidth(), in.getHeight(), Bitmap.Config.ARGB_8888);
+        for(int x = 0; x < in.getWidth(); x++) {
+            for(int y = 0; y < in.getHeight(); y++) {
+                int color = in.getPixel(x, y);
+                if((color & 0xffffff) == (fg & 0xffffff)) {// compare RGB
+                    int alpha = color & 0xff000000; // pixel alpha
+                    int fg_rgb = FG_COLOR & 0x00ffffff; // Foreground RGB 
+                    out.setPixel(x, y, alpha + fg_rgb);
+                } else if((color & 0xffffff) == (bg & 0xffffff)) {
+                    out.setPixel(x, y, BG_COLOR);
+                } else {
+                    out.setPixel(x, y, color);
+                }
+            }
+        }
+        return out;
+    }
+ 
     /**
      * Just like fetchBitmap, but with a callback instead of blocking
      */
@@ -161,5 +219,18 @@ public class Images {
             callback.callback(null);
         }
     }
+    
+    /** Accept any and all certificates */
+    static TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
+        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+            return null;
+        }
+        public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+            // No need to implement.
+        }
+        public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+            // No need to implement.
+        }
+    }};
     
 }

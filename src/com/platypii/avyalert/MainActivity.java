@@ -4,7 +4,7 @@ import java.io.IOException;
 import com.platypii.avyalert.R;
 import com.platypii.avyalert.data.Advisory;
 import com.platypii.avyalert.data.Callback;
-import com.platypii.avyalert.data.ImagesOLDDD;
+import com.platypii.avyalert.data.Images;
 import com.platypii.avyalert.data.Region;
 import com.platypii.avyalert.data.Regions;
 import android.net.Uri;
@@ -60,7 +60,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.main);
         
         // Initialize image cache
-        ImagesOLDDD.initCache(getApplicationContext().getCacheDir());
+        Images.initCache(getApplicationContext().getCacheDir());
 
         // Shared Preferences
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());

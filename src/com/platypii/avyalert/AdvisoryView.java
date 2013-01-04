@@ -1,6 +1,5 @@
 package com.platypii.avyalert;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import android.content.Context;
@@ -20,7 +19,7 @@ import android.widget.ImageView.ScaleType;
 import com.platypii.avyalert.data.Advisory;
 import com.platypii.avyalert.data.AvalancheRisk;
 import com.platypii.avyalert.data.Callback;
-import com.platypii.avyalert.data.ImagesOLDDD;
+import com.platypii.avyalert.data.Images;
 import com.platypii.avyalert.data.AvalancheRisk.Rating;
 
 
@@ -71,7 +70,7 @@ public class AdvisoryView extends RelativeLayout {
         // Build image views list
         imageViews = new ArrayList<ImageView>();
         if(advisory != null) {
-            for(@SuppressWarnings("unused") URL imageUrl : advisory.imageUrls) {
+            for(@SuppressWarnings("unused") String imageUrl : advisory.imageUrls) {
                 // Create image views
                 ImageView imgView = new ImageView(context);
                 imgView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT));
@@ -107,8 +106,8 @@ public class AdvisoryView extends RelativeLayout {
             
             // Rose
             // Color replacement
-            int fg = ImagesOLDDD.FG_COLOR;
-            int bg = ImagesOLDDD.BG_COLOR;
+            int fg = Images.FG_COLOR;
+            int bg = Images.BG_COLOR;
             try {
                 fg = Color.parseColor(advisory.region.roseForegroundColor);
             } catch(IllegalArgumentException e) {
@@ -124,7 +123,7 @@ public class AdvisoryView extends RelativeLayout {
             assert imageViews.size() == advisory.imageUrls.size();
             for(int i = 0; i < imageViews.size(); i++) {
                 ImageView imageView = imageViews.get(i);
-                URL imageUrl = advisory.imageUrls.get(i);
+                String imageUrl = advisory.imageUrls.get(i);
                 imagePanel.addView(imageView);
                 fetchImage(imageUrl, imageView);
             }
@@ -159,10 +158,10 @@ public class AdvisoryView extends RelativeLayout {
     }
     
     /** Downloads an image and inserts into the given ImageView */
-    private void fetchImage(URL imageUrl, final ImageView imageView) {
+    private void fetchImage(String imageUrl, final ImageView imageView) {
         imageView.setVisibility(View.GONE); // Hide for now, show when image is downloaded
         final Advisory fetchedAdvisory = advisory; // Save to check if its changed
-        ImagesOLDDD.fetchBitmapAsync(imageUrl, new Callback<Bitmap>() {
+        Images.fetchBitmapAsync(imageUrl.toString(), new Callback<Bitmap>() {
             @Override
             public void callback(Bitmap bmp) {
                 if(Util.eq(advisory, fetchedAdvisory)) {
@@ -175,17 +174,17 @@ public class AdvisoryView extends RelativeLayout {
     }
         
     /** Special method for the rose to do color replacement */
-    private void fetchImageReplaceColor(URL imageUrl, final ImageView imageView, final int fg, final int bg) {
+    private void fetchImageReplaceColor(String imageUrl, final ImageView imageView, final int fg, final int bg) {
         imageView.setVisibility(View.GONE); // Hide for now, show when image is downloaded
         // Fetch image
         final Advisory fetchedAdvisory = advisory; // Save to check if its changed
-        ImagesOLDDD.fetchBitmapAsync(advisory.roseUrl, new Callback<Bitmap>() {
+        Images.fetchBitmapAsync(advisory.roseUrl, new Callback<Bitmap>() {
             @Override
             public void callback(Bitmap bmp) {
                 if(Util.eq(advisory, fetchedAdvisory) && bmp != null) {
                     // Advisory hasn't changed since we started fetching, so show the rose
                     // Replace foreground and background
-                    bmp = ImagesOLDDD.replaceColor(bmp, fg, bg);
+                    bmp = Images.replaceColor(bmp, fg, bg);
                     if(bmp.getHeight() < MIN_HEIGHT) {
                         // Scale up if the image is too small
                         int width = MIN_HEIGHT * bmp.getWidth() / bmp.getHeight();

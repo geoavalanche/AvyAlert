@@ -1,6 +1,5 @@
 package com.platypii.avyalert.data;
 
-import java.net.URL;
 import java.util.List;
 import com.platypii.avyalert.Util;
 import com.platypii.avyalert.data.AvalancheRisk.Rating;
@@ -15,14 +14,14 @@ public class Advisory {
     public final Region region;
     public final String date;
     public final Rating rating;
-    public final URL roseUrl;
-    public final List<URL> imageUrls;
+    public final String roseUrl;
+    public final List<String> imageUrls;
     public final String details;
 
     // public boolean notified = false; // Has the user been notified of this advisory?
 
     
-    public Advisory(Region region, String date, Rating rating, URL roseUrl, List<URL> imageUrls, String details) {
+    public Advisory(Region region, String date, Rating rating, String roseUrl, List<String> imageUrls, String details) {
         this.region = region;
         this.date = date;
         this.rating = rating;

@@ -57,13 +57,13 @@ public class Region {
         Rating rating = parseRating(doc, ratingSelector);
         
         // Parse rose
-        URL roseUrl = parseImageUrl(doc, roseSelector);
+        String roseUrl = parseImageUrl(doc, roseSelector);
         
         // Parse extra images
-        List<URL> imageUrls = new ArrayList<URL>();
+        List<String> imageUrls = new ArrayList<String>();
         if(imageSelectors != null) {
             for(String imageSelector : imageSelectors) {
-                final URL imageUrl = parseImageUrl(doc, imageSelector);
+                final String imageUrl = parseImageUrl(doc, imageSelector);
                 if(imageUrl != null)
                     imageUrls.add(imageUrl);
             }
@@ -102,7 +102,7 @@ public class Region {
     }
     
     /** Searches the document for a given selector. From this, return the url to the first img tag's src */
-    private URL parseImageUrl(Document doc, String selector) {
+    private String parseImageUrl(Document doc, String selector) {
         String url = null;
         try {
             if(selector != null && !selector.equals("")) {
@@ -119,9 +119,9 @@ public class Region {
                     if(! url.matches("^https?://.*")) {
                         URL abs = new URL(new URL(advisoryUrl), url);
                         Log.v(regionName, "absolute image url: " + abs);
-                        return abs;
+                        return abs.toString();
                     } else {
-                        return new URL(url);
+                        return url;
                     }
                 } else {
                     Log.v(regionName, "Failed to parse url: \""+html+"\"");
@@ -148,7 +148,7 @@ public class Region {
         else if(regionName.equals("Mt Washington, NH")) bannerView.setImageResource(R.drawable.banner_tuckerman);
         else {
             // Download from bannerUrl
-            ImagesOLDDD.fetchCachedBitmapAsync(getURL(bannerUrl), callback);
+            Images.fetchCachedBitmapAsync(getURL(bannerUrl).toString(), callback);
         }
     }
     
