@@ -28,7 +28,7 @@ public class SettingsActivity extends PreferenceActivity {
             actionBar.setHomeButtonEnabled(true);
         }
 
-        if(!Debug.DEBUG_NOTIFICATIONS) {
+        if(Debug.ENABLE_NOTIFICATIONS) {
             findPreference("enablePush").setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
