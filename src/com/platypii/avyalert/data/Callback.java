@@ -1,4 +1,4 @@
-package com.platypii.avyalert;
+package com.platypii.avyalert.data;
 
 
 /**

@@ -1,7 +1,6 @@
 package com.platypii.avyalert.data;
 
 import com.platypii.avyalert.R;
-import com.platypii.avyalert.R.drawable;
 
 
 /**

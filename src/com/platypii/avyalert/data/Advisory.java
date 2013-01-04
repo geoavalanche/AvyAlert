@@ -2,6 +2,7 @@ package com.platypii.avyalert.data;
 
 import java.net.URL;
 import java.util.List;
+import com.platypii.avyalert.Util;
 import com.platypii.avyalert.data.AvalancheRisk.Rating;
 
 
@@ -35,18 +36,14 @@ public class Advisory {
         if(obj instanceof Advisory && obj != null) {
             Advisory other = (Advisory) obj;
             if(!region.equals(other.region)) return false;
-            if(!eq(date, other.date)) return false;
+            if(!Util.eq(date, other.date)) return false;
             if(rating != other.rating) return false;
-            if(!eq(roseUrl, other.roseUrl)) return false;
-            if(!eq(imageUrls, other.imageUrls)) return false;
-            if(!eq(details, other.details)) return false;
+            if(!Util.eq(roseUrl, other.roseUrl)) return false;
+            if(!Util.eq(imageUrls, other.imageUrls)) return false;
+            if(!Util.eq(details, other.details)) return false;
             return true;
         }
         return false;
-    }
-    /** Equality checker that doesn't NullPointerException */
-    private static boolean eq(Object a, Object b) {
-        return (a == null && b == null) || a.equals(b);
     }
 
 }

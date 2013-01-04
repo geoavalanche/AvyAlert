@@ -11,8 +11,6 @@ import org.jsoup.nodes.Document;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.widget.ImageView;
-import com.platypii.avyalert.Callback;
-import com.platypii.avyalert.Images;
 import com.platypii.avyalert.R;
 import com.platypii.avyalert.data.AvalancheRisk.Rating;
 
@@ -85,8 +83,13 @@ public class Region {
 
     private Rating parseRating(Document doc, String selector) {
         if(selector != null && !selector.equals("")) {
-            String html = doc.select(selector).html();
-            if(html.matches("(?si).*Extreme.*")) return Rating.EXTREME;
+            final String html = doc.select(selector).toString();
+            if(html.matches("(?s).*EXTREME.*")) return Rating.EXTREME;
+            else if(html.matches("(?s).*HIGH.*")) return Rating.HIGH;
+            else if(html.matches("(?s).*CONSIDERABLE.*")) return Rating.CONSIDERABLE;
+            else if(html.matches("(?s).*MODERATE.*")) return Rating.MODERATE;
+            else if(html.matches("(?s).*LOW.*")) return Rating.LOW;
+            else if(html.matches("(?si).*Extreme.*")) return Rating.EXTREME;
             else if(html.matches("(?si).*High.*")) return Rating.HIGH;
             else if(html.matches("(?si).*Considerable.*")) return Rating.CONSIDERABLE;
             else if(html.matches("(?si).*Moderate.*")) return Rating.MODERATE;
@@ -145,7 +148,7 @@ public class Region {
         else if(regionName.equals("Mt Washington, NH")) bannerView.setImageResource(R.drawable.banner_tuckerman);
         else {
             // Download from bannerUrl
-            Images.fetchCachedBitmapAsync(getURL(bannerUrl), callback);
+            ImagesOLDDD.fetchCachedBitmapAsync(getURL(bannerUrl), callback);
         }
     }
     

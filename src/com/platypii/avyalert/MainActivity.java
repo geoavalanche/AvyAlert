@@ -3,6 +3,8 @@ package com.platypii.avyalert;
 import java.io.IOException;
 import com.platypii.avyalert.R;
 import com.platypii.avyalert.data.Advisory;
+import com.platypii.avyalert.data.Callback;
+import com.platypii.avyalert.data.ImagesOLDDD;
 import com.platypii.avyalert.data.Region;
 import com.platypii.avyalert.data.Regions;
 import android.net.Uri;
@@ -25,6 +27,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
 
 /**
@@ -35,18 +38,13 @@ public class MainActivity extends Activity {
 
     private static Region currentRegion = null; // The current region
     private static Advisory currentAdvisory = null; // The advisory currently being displayed
-    private AdvisoryView currentAdvisoryViewer = null; // Translates the current advisory into view
 
     // Views
     private ScrollView scrollView;
-    private View mainPanel;
-    
-    // Region (banner)
     private ImageView regionView;
-
-    // Advisory
-    private View advisoryPanel;
+    private AdvisoryView advisoryView;
     private View advisoryLink;
+    private TextView centerLabel;
     
     // Overlays
     private int runningTasks = 0; // Number of AsyncTasks running the background
@@ -60,6 +58,9 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        
+        // Initialize image cache
+        ImagesOLDDD.initCache(getApplicationContext().getCacheDir());
 
         // Shared Preferences
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -69,10 +70,10 @@ public class MainActivity extends Activity {
 
         // Find views
         scrollView = (ScrollView) findViewById(R.id.scrollView);
-        mainPanel = findViewById(R.id.mainPanel);
         regionView = (ImageView) findViewById(R.id.regionView);
-        advisoryPanel = findViewById(R.id.advisoryPanel);
+        advisoryView = (AdvisoryView) findViewById(R.id.advisoryView);
         advisoryLink = findViewById(R.id.advisoryLink);
+        centerLabel = (TextView) findViewById(R.id.centerLabel);
         loadingIcon = (ProgressBar) findViewById(R.id.loadingIcon);
         refreshView = findViewById(R.id.refreshView);
 
@@ -85,6 +86,7 @@ public class MainActivity extends Activity {
         
         // Check if activity was opened with a specific region
         Intent intent = getIntent();
+        // TODO: intent.getExtras();
         if(intent != null && intent.hasExtra("com.platypii.avyalert.currrentRegion")) {
             String regionName = intent.getStringExtra("com.platypii.avyalert.currentRegion");
             setCurrentRegion(Regions.getRegion(regionName));
@@ -97,13 +99,11 @@ public class MainActivity extends Activity {
             } else {
                 setCurrentRegion(currentRegion);
             }
-            if(currentAdvisory != null && currentAdvisory.region.equals(currentRegion)) {
-                // Region and advisory still exist from previous MainActivity instance
+            if(currentAdvisory != null && !currentAdvisory.region.equals(currentRegion)) {
                 // TODO: Check if the currentAdvisory is stale
-                setCurrentAdvisory(currentAdvisory);
-            } else {
-                setCurrentAdvisory(null);
+                currentAdvisory = null;
             }
+            advisoryView.setAdvisory(currentAdvisory);
         }
 
         if(currentRegion == null) {
@@ -133,7 +133,7 @@ public class MainActivity extends Activity {
      * Fetch region data, then update views accordingly
      */
     private void fetchRegionData() {
-        Regions.fetchRegionData(sharedPrefs, new Callback<Boolean>() {
+        Regions.fetchRegionDataAsync(sharedPrefs, new Callback<Boolean>() {
             @Override
             public void callback(Boolean result) {
                 if(result) {
@@ -185,19 +185,18 @@ public class MainActivity extends Activity {
     }
     private AlertDialog regionDialog;
 
-    /**
-     * Sets the current region, and updates the advisory if the region changed
-     */
+    /** Sets the current region, and updates the advisory if the region changed */
     private void setCurrentRegion(Region newRegion) {
         if(newRegion == null) {
             Log.w("RegionDialog", "Null region, wtf?");
             currentRegion = null;
-            setCurrentAdvisory(null);
+            advisoryView.setAdvisory(null);
             updateRegion();
         } else if(currentRegion == null || !currentRegion.equals(newRegion)) {
             // Change region
             currentRegion = newRegion;
-            setCurrentAdvisory(null);
+            currentAdvisory = null;
+            advisoryView.setAdvisory(null);
             updateRegion();
             // Fetch new Advisory
             fetchAdvisory();
@@ -240,6 +239,9 @@ public class MainActivity extends Activity {
             });
             regionView.setContentDescription(currentRegion.regionName);
             regionView.setVisibility(View.VISIBLE);
+            // Link
+            centerLabel.setText("from " + currentRegion.centerName);
+            advisoryLink.setVisibility(View.VISIBLE);
         } else {
             regionView.setVisibility(View.GONE);
         }
@@ -272,7 +274,8 @@ public class MainActivity extends Activity {
                         // Failed to load any advisory, show refresh button
                         refreshView.setVisibility(View.VISIBLE);
                     } else if(advisory != null && advisory.region.equals(currentRegion)) {
-                        setCurrentAdvisory(advisory);
+                        currentAdvisory = advisory;
+                        advisoryView.setAdvisory(currentAdvisory);
                     }
                     runningTasks--;
                     if(runningTasks == 0)
@@ -282,33 +285,6 @@ public class MainActivity extends Activity {
                     // Alerter.notifyUser(getApplicationContext(), advisory);
                 }
             }.execute();
-        }
-    }
-    
-    /**
-     * Loads an advisory into the current view
-     */
-    private void setCurrentAdvisory(Advisory advisory) {
-        if(currentAdvisory != null && !currentAdvisory.equals(advisory)) {
-            // Detach old advisory
-            currentAdvisoryViewer.onDetach();
-        }
-        if(advisory == null) {
-            // Clear the advisory
-            currentAdvisory = null;
-            currentAdvisoryViewer = null;
-            advisoryPanel.setVisibility(View.GONE);
-            advisoryLink.setVisibility(View.GONE);
-        } else if(!advisory.equals(currentAdvisory)) {
-            // Attach new advisory
-            currentAdvisory = advisory;
-            currentAdvisoryViewer = new AdvisoryView(currentAdvisory);
-            currentAdvisoryViewer.onAttach(this, mainPanel);
-            advisoryPanel.setVisibility(View.VISIBLE);
-        } else {
-            Log.v("Main", "Loaded same advisory into view");
-//            currentAdvisory = advisory;
-//            currentAdvisory.updateView(mainPanel);
         }
     }
     
@@ -398,12 +374,6 @@ public class MainActivity extends Activity {
         if(regionDialog != null) {
             regionDialog.cancel();
             regionDialog = null;
-        }
-        // Detach current advisory
-        if(currentAdvisory != null) {
-            currentAdvisory = null; // Remove current advisory?
-            currentAdvisoryViewer.onDetach();
-            currentAdvisoryViewer = null;
         }
         // TODO: Stop AsyncTasks?
         // GCMRegistrar.onDestroy(this);

@@ -8,14 +8,19 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.text.Html;
 import android.text.Spanned;
+import android.util.AttributeSet;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ImageView.ScaleType;
 import com.platypii.avyalert.data.Advisory;
 import com.platypii.avyalert.data.AvalancheRisk;
+import com.platypii.avyalert.data.Callback;
+import com.platypii.avyalert.data.ImagesOLDDD;
 import com.platypii.avyalert.data.AvalancheRisk.Rating;
 
 
@@ -24,11 +29,12 @@ import com.platypii.avyalert.data.AvalancheRisk.Rating;
  * An AdvisoryViewer is created for an advisory, and can then be attached and detached to a View.
  * @author platypii
  */
-public class AdvisoryView {
-    
-    private final Advisory advisory;
+public class AdvisoryView extends RelativeLayout {
 
-    private boolean isAttached = false; // Has this advisory been attached to a view?
+    private Context context;
+    
+    private Advisory advisory;
+
     private TextView dateLabel;
     private ImageView ratingIcon;
     private TextView ratingLabel;
@@ -36,96 +42,113 @@ public class AdvisoryView {
     private LinearLayout imagePanel;
     private List<ImageView> imageViews;
     private TextView detailsLabel;
-    private View advisoryLink;
-    private TextView centerLabel;
+
 
     private static final int MIN_HEIGHT = 300; // Minimum image height, otherwise scale up
 
     
-    public AdvisoryView(Advisory advisory) {
-        if(advisory == null) Log.w("AdvisoryViewer", "Advisory Viewer created with null advisory");
-        this.advisory = advisory;
+    public AdvisoryView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        this.context = context;
+        LayoutInflater.from(context).inflate(R.layout.advisory_view, this, true);
+        // Find views
+        dateLabel = (TextView) findViewById(R.id.dateLabel);
+        ratingIcon = (ImageView) findViewById(R.id.ratingIcon);
+        ratingLabel = (TextView) findViewById(R.id.ratingLabel);
+        roseView = (ImageView) findViewById(R.id.roseView);
+        imagePanel = (LinearLayout) findViewById(R.id.imagePanel);
+        detailsLabel = (TextView) findViewById(R.id.detailsLabel);
     }
-    
+
     /**
      * Called when this advisory is brought into view
-     * @param advisoryView a View containing all the advisory views
      */
-    public void onAttach(Context context, View view) {
-        if(isAttached == true) Log.w("Advisory", "["+advisory.region+"] Attaching advisory that was not detached");
-        isAttached = true;
-        // Find views
-        dateLabel = (TextView) view.findViewById(R.id.dateLabel);
-        ratingIcon = (ImageView) view.findViewById(R.id.ratingIcon);
-        ratingLabel = (TextView) view.findViewById(R.id.ratingLabel);
-        roseView = (ImageView) view.findViewById(R.id.roseView);
-        imagePanel = (LinearLayout) view.findViewById(R.id.imagePanel);
+    public void setAdvisory(Advisory advisory) {
+        if(advisory == null)
+            Log.i("AdvisoryViewer", "Attached null advisory to AdvisoryViewer");
+        this.advisory = advisory;
+
+        // Build image views list
         imageViews = new ArrayList<ImageView>();
-        for(@SuppressWarnings("unused") URL imageUrl : advisory.imageUrls) {
-            // Create image views
-            ImageView imgView = new ImageView(context);
-            imgView.setAdjustViewBounds(true);
-            imgView.setScaleType(ScaleType.CENTER_INSIDE);
-            imageViews.add(imgView);
+        if(advisory != null) {
+            for(@SuppressWarnings("unused") URL imageUrl : advisory.imageUrls) {
+                // Create image views
+                ImageView imgView = new ImageView(context);
+                imgView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT));
+                imgView.setAdjustViewBounds(true);
+                imgView.setScaleType(ScaleType.CENTER_INSIDE);
+                imageViews.add(imgView);
+            }
         }
-        detailsLabel = (TextView) view.findViewById(R.id.detailsLabel);
-        advisoryLink = view.findViewById(R.id.advisoryLink);
-        centerLabel = (TextView) view.findViewById(R.id.centerLabel);
         // Update
         updateView();
     }
     
     public void updateView() {
-        assert isAttached;
-        // Load advisory into views
-        ratingLabel.setBackgroundColor(AvalancheRisk.getBackgroundColor(advisory.rating));
-        if(advisory.rating != Rating.NONE) {
-            ratingIcon.setImageResource(AvalancheRisk.getImage(advisory.rating));
-            ratingLabel.setText(advisory.rating.toString());
-            ratingLabel.setTextColor(AvalancheRisk.getForegroundColor(advisory.rating));
-            ratingIcon.setVisibility(View.VISIBLE);
-            ratingLabel.setVisibility(View.VISIBLE);
+        if(advisory != null) {
+            // Load advisory into views
+            ratingLabel.setBackgroundColor(AvalancheRisk.getBackgroundColor(advisory.rating));
+            if(advisory.rating != Rating.NONE) {
+                ratingIcon.setImageResource(AvalancheRisk.getImage(advisory.rating));
+                ratingLabel.setText(advisory.rating.toString());
+                ratingLabel.setTextColor(AvalancheRisk.getForegroundColor(advisory.rating));
+                ratingIcon.setVisibility(View.VISIBLE);
+                ratingLabel.setVisibility(View.VISIBLE);
+            } else {
+                ratingIcon.setVisibility(View.GONE);
+                ratingLabel.setVisibility(View.GONE);
+            }
+            if(advisory.date == null || advisory.date.equals("")) {
+                dateLabel.setVisibility(View.GONE);
+            } else {
+                dateLabel.setText("Date: " + advisory.date);
+                dateLabel.setVisibility(View.VISIBLE);
+            }
+            
+            // Rose
+            // Color replacement
+            int fg = ImagesOLDDD.FG_COLOR;
+            int bg = ImagesOLDDD.BG_COLOR;
+            try {
+                fg = Color.parseColor(advisory.region.roseForegroundColor);
+            } catch(IllegalArgumentException e) {
+            } catch(NullPointerException e) {}
+            try {
+                bg = Color.parseColor(advisory.region.roseBackgroundColor);
+            } catch(IllegalArgumentException e) {
+            } catch(NullPointerException e) {}
+            fetchImageReplaceColor(advisory.roseUrl, roseView, fg, bg);
+    
+            // Extra images
+            imagePanel.removeAllViews();
+            assert imageViews.size() == advisory.imageUrls.size();
+            for(int i = 0; i < imageViews.size(); i++) {
+                ImageView imageView = imageViews.get(i);
+                URL imageUrl = advisory.imageUrls.get(i);
+                imagePanel.addView(imageView);
+                fetchImage(imageUrl, imageView);
+            }
+    
+            // Details
+            try {
+                detailsLabel.setText(formatHtml(advisory.details));
+            } catch(IndexOutOfBoundsException e) {
+                Log.e("AdvisoryView", "Error rendering details", e);
+            }
+            detailsLabel.setVisibility(View.VISIBLE);
+
+            this.setVisibility(View.VISIBLE);
         } else {
+            // Null advisory
+            this.setVisibility(View.INVISIBLE);
+            imagePanel.removeAllViews();
+            dateLabel.setVisibility(View.GONE);
             ratingIcon.setVisibility(View.GONE);
             ratingLabel.setVisibility(View.GONE);
+            roseView.setVisibility(View.GONE);
+            imagePanel.setVisibility(View.GONE);
+            detailsLabel.setText("");
         }
-        if(advisory.date == null || advisory.date.equals("")) {
-            dateLabel.setVisibility(View.GONE);
-        } else {
-            dateLabel.setText("Date: " + advisory.date);
-            dateLabel.setVisibility(View.VISIBLE);
-        }
-        
-        // Rose
-        // Color replacement
-        int fg = Images.FG_COLOR;
-        int bg = Images.BG_COLOR;
-        try {
-            fg = Color.parseColor(advisory.region.roseForegroundColor);
-        } catch(IllegalArgumentException e) {
-        } catch(NullPointerException e) {}
-        try {
-            bg = Color.parseColor(advisory.region.roseBackgroundColor);
-        } catch(IllegalArgumentException e) {
-        } catch(NullPointerException e) {}
-        fetchImageReplaceColor(advisory.roseUrl, roseView, fg, bg);
-
-        // Extra images
-        imagePanel.removeAllViews();
-        assert imageViews.size() == advisory.imageUrls.size();
-        for(int i = 0; i < imageViews.size(); i++) {
-            ImageView imageView = imageViews.get(i);
-            URL imageUrl = advisory.imageUrls.get(i);
-            imagePanel.addView(imageView);
-            fetchImage(imageUrl, imageView);
-        }
-
-        // Details
-        detailsLabel.setText(formatHtml(advisory.details));
-        detailsLabel.setVisibility(View.VISIBLE);
-        // Link
-        centerLabel.setText("from " + advisory.region.centerName);
-        advisoryLink.setVisibility(View.VISIBLE);
     }
     
     /** Cleans the html and returns styled text ready for a TextView */
@@ -135,29 +158,14 @@ public class AdvisoryView {
        return Html.fromHtml(html);
     }
     
-    /** Detaches this Advisory from the View it is attached to */
-    public void onDetach() {
-        if(isAttached == true) Log.w("Advisory", "Detaching advisory that was not attached");
-        isAttached = false;
-        // Remove imageViews
-        imagePanel.removeAllViews();
-        // Clear the advisory
-//        dateLabel.setVisibility(View.GONE);
-//        ratingIcon.setVisibility(View.GONE);
-//        ratingLabel.setVisibility(View.GONE);
-//        roseView.setVisibility(View.GONE);
-//        imagePanel.setVisibility(View.GONE);
-//        detailsLabel.setText("");
-//        advisoryLink.setVisibility(View.GONE);
-    }
-    
     /** Downloads an image and inserts into the given ImageView */
     private void fetchImage(URL imageUrl, final ImageView imageView) {
         imageView.setVisibility(View.GONE); // Hide for now, show when image is downloaded
-        Images.fetchBitmapAsync(imageUrl, new Callback<Bitmap>() {
+        final Advisory fetchedAdvisory = advisory; // Save to check if its changed
+        ImagesOLDDD.fetchBitmapAsync(imageUrl, new Callback<Bitmap>() {
             @Override
             public void callback(Bitmap bmp) {
-                if(isAttached) {
+                if(Util.eq(advisory, fetchedAdvisory)) {
                     // Advisory hasn't changed since we started fetching, so show the rose
                     imageView.setImageBitmap(bmp);
                     imageView.setVisibility(View.VISIBLE);
@@ -170,13 +178,14 @@ public class AdvisoryView {
     private void fetchImageReplaceColor(URL imageUrl, final ImageView imageView, final int fg, final int bg) {
         imageView.setVisibility(View.GONE); // Hide for now, show when image is downloaded
         // Fetch image
-        Images.fetchBitmapAsync(advisory.roseUrl, new Callback<Bitmap>() {
+        final Advisory fetchedAdvisory = advisory; // Save to check if its changed
+        ImagesOLDDD.fetchBitmapAsync(advisory.roseUrl, new Callback<Bitmap>() {
             @Override
             public void callback(Bitmap bmp) {
-                if(isAttached && bmp != null) {
+                if(Util.eq(advisory, fetchedAdvisory) && bmp != null) {
                     // Advisory hasn't changed since we started fetching, so show the rose
                     // Replace foreground and background
-                    bmp = Images.replaceColor(bmp, fg, bg);
+                    bmp = ImagesOLDDD.replaceColor(bmp, fg, bg);
                     if(bmp.getHeight() < MIN_HEIGHT) {
                         // Scale up if the image is too small
                         int width = MIN_HEIGHT * bmp.getWidth() / bmp.getHeight();

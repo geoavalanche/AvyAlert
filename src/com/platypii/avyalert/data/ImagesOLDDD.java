@@ -1,4 +1,4 @@
-package com.platypii.avyalert;
+package com.platypii.avyalert.data;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,7 +22,7 @@ import android.util.Log;
  * Class for fetching images from the web
  * @author platypii
  */
-public class Images {
+public class ImagesOLDDD {
     
     public static final int FG_COLOR = 0xffdddddd;
     public static final int BG_COLOR = 0x00000000;
@@ -38,7 +38,7 @@ public class Images {
      * @param cacheDir should be the result of Context.getCacheDir()
      */
     public static void initCache(File cacheDir) {
-        Images.cacheDir = cacheDir;
+        ImagesOLDDD.cacheDir = cacheDir;
     }
 
     /** Downloads a bitmap. Synchronous (will block). */
@@ -100,7 +100,7 @@ public class Images {
                     sc.init(null, trustAllCerts, new java.security.SecureRandom());
                     HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
                 } catch(GeneralSecurityException e) {
-                    Log.i("Main", "Error setting TrsutManager", e);
+                    Log.i("Main", "Error setting TrustManager", e);
                 }
                 // Connect to https
                 return imageUrl.openStream();
@@ -153,7 +153,7 @@ public class Images {
             new AsyncTask<Void,Void,Bitmap>() {
                 @Override
                 protected Bitmap doInBackground(Void... params) {
-                    return Images.fetchBitmap(imageUrl);
+                    return ImagesOLDDD.fetchBitmap(imageUrl);
                 }
                 @Override
                 protected void onPostExecute(Bitmap result) {
@@ -174,7 +174,7 @@ public class Images {
             new AsyncTask<Void,Void,Bitmap>() {
                 @Override
                 protected Bitmap doInBackground(Void... params) {
-                    return Images.fetchCachedBitmap(url);
+                    return ImagesOLDDD.fetchCachedBitmap(url);
                 }
                 @Override
                 protected void onPostExecute(Bitmap result) {

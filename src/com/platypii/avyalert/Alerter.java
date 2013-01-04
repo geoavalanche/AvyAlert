@@ -22,9 +22,7 @@ import android.util.Log;
 public class Alerter {
 
 
-    /**
-     * Notify the user of advisory
-     */
+    /** Notify the user of advisory */
     public static void notifyUser(Context context, Advisory advisory) {
         if(advisory == null) return;
 
@@ -86,9 +84,7 @@ public class Alerter {
         notificationManager.notify(Regions.indexOf(advisory.region.regionName), noti);
     }
 
-    /**
-     * Returns true Friday 16:00 -> Sunday 11:59
-     */
+    /** Returns true Friday 16:00 -> Sunday 11:59 */
     private static boolean isWeekend() {
         Calendar cal = Calendar.getInstance();
         int day = cal.get(Calendar.DAY_OF_WEEK);
@@ -98,9 +94,7 @@ public class Alerter {
         else return false;
     }
     
-    /**
-     * Register for push notifications, if paid and enabled
-     */
+    /** Register for push notifications, if paid and enabled */
     public static void enableNotifications(Context context) {
         // TODO: Check billing state
         if(true) { // TODO: CHECK BILLING STATE!
@@ -114,34 +108,31 @@ public class Alerter {
         }
     }
      
-    /**
-     * Register for push notifications from Google Cloud Messaging
-     */
+    /** Register for push notifications from Google Cloud Messaging */
     private static void registerNotifications(final Context context) {
-        try {
-            GCMRegistrar.checkDevice(context);
-            GCMRegistrar.checkManifest(context);
-            final String regId = GCMRegistrar.getRegistrationId(context);
-            if(regId.equals("")) {
-                GCMRegistrar.register(context, GCMIntentService.SENDER_ID);
-                Log.v("Push", "Registered for push notifications");
-            } else {
-                if(GCMRegistrar.isRegisteredOnServer(context)) {
-                    Log.v("Push", "Already registered for push notifications");
-                } else {
-                    // Try to register again, but not in the UI thread.
-                    new AsyncTask<Void, Void, Void>() {
-                        @Override
-                        protected Void doInBackground(Void... params) {
+        // Try to register, but not in the UI thread.
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    GCMRegistrar.checkDevice(context);
+                    GCMRegistrar.checkManifest(context);
+                    final String regId = GCMRegistrar.getRegistrationId(context);
+                    if(regId.equals("")) {
+                        GCMRegistrar.register(context, GCMIntentService.SENDER_ID);
+                        Log.v("Push", "Registered for push notifications");
+                    } else {
+                        if(GCMRegistrar.isRegisteredOnServer(context)) {
+                            Log.v("Push", "Already registered for push notifications");
+                        } else {
                             PushServerUtilities.register(context, regId);
-                            return null;
                         }
-                    }.execute();
+                    }
+                } catch(UnsupportedOperationException e) {
+                    Log.w("Push", "Push notifications not supported");
                 }
+                return null;
             }
-        } catch(UnsupportedOperationException e) {
-            Log.w("Push", "Push notifications not supported");
-        }
-
+        }.execute();
     }
 }

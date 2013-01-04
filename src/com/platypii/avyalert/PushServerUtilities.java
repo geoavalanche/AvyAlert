@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
 
 
 /**
@@ -35,59 +34,36 @@ import java.util.Random;
  */
 public final class PushServerUtilities {
 
-    // Base URL of the Demo Server (such as http://my_host:8080/gcm-demo)
-    static final String SERVER_URL = "http://localhost:8888";
+    // Base URL of PlatypiiIndustries Server
+    private static final String SERVER_URL = Debug.DEBUG? "http://localhost:2048/avalanche" : "http://platypiiindustries.com:2048/avalanche";
+    
 
     // Google API project id registered to use GCM.
-    static final String SENDER_ID = "381193425580";
+    private static final String SENDER_ID = "381193425580";
 
-    private static final int MAX_ATTEMPTS = 5;
-    private static final int BACKOFF_MILLI_SECONDS = 2000;
-    private static final Random random = new Random();
 
     /**
-     * Register this account/device pair within the server.
-     * 
+     * Register this account/device pair with platypiiindustries.
+     * DO NOT CALL FROM UI THREAD!
      */
     static void register(final Context context, final String regId) {
         Log.i("PushUtilities", "registering device (regId = " + regId + ")");
         String serverUrl = SERVER_URL + "/register";
         Map<String, String> params = new HashMap<String, String>();
         params.put("regId", regId);
-        long backoff = BACKOFF_MILLI_SECONDS + random.nextInt(1000);
-        // Once GCM returns a registration id, we need to register it in the
-        // demo server. As the server might be down, we will retry it a couple
-        // times.
-        for(int i = 1; i <= MAX_ATTEMPTS; i++) {
-            Log.d("PushUtilities", "Attempt #" + i + " to register");
-            try {
-                Log.d("PushUtilities", "Trying to register device");
-                post(serverUrl, params);
-                GCMRegistrar.setRegisteredOnServer(context, true);
-                Log.d("PushUtilities", "Server added device");
-                return;
-            } catch(IOException e) {
-                // Here we are simplifying and retrying on any error; in a real
-                // application, it should retry only on unrecoverable errors
-                // (like HTTP error code 503).
-                Log.e("PushUtilities", "Failed to register on attempt " + i + ":" + e);
-                if(i == MAX_ATTEMPTS) {
-                    break;
-                }
-                try {
-                    Log.d("PushUtilities", "Sleeping for " + backoff + " ms before retry");
-                    Thread.sleep(backoff);
-                } catch(InterruptedException e1) {
-                    // Activity finished before we complete - exit.
-                    Log.d("PushUtilities", "Thread interrupted: abort remaining retries!");
-                    Thread.currentThread().interrupt();
-                    return;
-                }
-                // increase backoff exponentially
-                backoff *= 2;
-            }
+        // Once GCM returns a registration id, we need to register with PlatypiiIndustries
+        try {
+            Log.d("PushUtilities", "Trying to register device");
+            post(serverUrl, params);
+            GCMRegistrar.setRegisteredOnServer(context, true);
+            Log.d("PushUtilities", "Server added device");
+            return;
+        } catch(IOException e) {
+            // Here we are simplifying and retrying on any error; in a real application,
+            // it should retry only on recoverable errors (like HTTP error code 503).
+            Log.e("PushUtilities", "Failed to register with PlatypiiIndustries.");
+            // TODO: Try again later
         }
-        Log.d("PushUtilities", "Failed to register device");
     }
 
     /**

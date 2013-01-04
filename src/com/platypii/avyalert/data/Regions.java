@@ -1,24 +1,16 @@
 package com.platypii.avyalert.data;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
-import com.platypii.avyalert.Callback;
 import com.platypii.avyalert.Debug;
 import com.platypii.avyalert.R;
 import android.content.Context;
@@ -107,42 +99,18 @@ public class Regions {
      * Fetches new region data from the internet
      * @param callback callback to notify of new region data
      */
-    public static void fetchRegionData(final SharedPreferences prefs, final Callback<Boolean> callback) {
+    public static void fetchRegionDataAsync(final SharedPreferences prefs, final Callback<Boolean> callback) {
         Log.v("Regions", "Fetching region data: " + regionDataUrl);
         new AsyncTask<Void, Void, String>() {
             @Override
-            protected void onPreExecute() {}
-            @Override
             protected String doInBackground(Void... params) {
-                BufferedReader in = null;
                 try {
-                    // http request
-                    final HttpClient client = new DefaultHttpClient();
-                    final HttpGet request = new HttpGet();
-                    request.setURI(new URI(regionDataUrl));
-                    final HttpResponse response = client.execute(request);
-                    
-                    // Read body
-                    in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-                    final StringBuffer data = new StringBuffer("");
-                    String line;
-                    while((line = in.readLine()) != null) {
-                        data.append(line);
-                        data.append('\n');
-                    }
-                    return data.toString();
-                } catch(URISyntaxException e) {
-                    Log.w("Regions", "Error parsing region data url");
+                    // Download new region data (I <3 IOUtils!)
+                    return IOUtils.toString(new URL(regionDataUrl));
                 } catch(IOException e) {
                     Log.w("Regions", "Failed to download new region data");
-                } finally {
-                    if(in != null) {
-                        try {
-                            in.close();
-                        } catch(IOException e) {}
-                    }
+                    return null;
                 }
-                return null;
             }
             @Override
             protected void onPostExecute(String regionData) {
