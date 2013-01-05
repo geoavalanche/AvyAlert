@@ -146,18 +146,19 @@ public class Region {
         else if(regionName.equals("Mount Rainier, WA")) bannerView.setImageResource(R.drawable.banner_rainier);
         else if(regionName.equals("Tetons, WY")) bannerView.setImageResource(R.drawable.banner_tetons);
         else if(regionName.equals("Mt Washington, NH")) bannerView.setImageResource(R.drawable.banner_tuckerman);
+        else if(regionName.matches(".*, CO")) bannerView.setImageResource(R.drawable.banner_colorado);
         else {
             // Download from bannerUrl
-            Images.fetchCachedBitmapAsync(getURL(bannerUrl).toString(), callback);
+            Images.fetchCachedBitmapAsync(getURL(bannerUrl), callback);
         }
     }
     
     /** Returns */
-    private URL getURL(String str) {
+    private String getURL(String str) {
         try {
             URL url = new URL(str);
             // TODO: handle relative URLs
-            return url;
+            return url.toString();
         } catch(MalformedURLException e) {
             Log.i(regionName, "Malformed url: " + str);
             return null;

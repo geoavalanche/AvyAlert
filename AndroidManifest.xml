@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.platypii.avyalert"
-    android:versionCode="2"
-    android:versionName="1.1" >
+    android:versionCode="3"
+    android:versionName="1.2" >
 
     <uses-sdk
         android:minSdkVersion="8"
@@ -41,6 +41,14 @@
 
 		<activity
 			android:name="com.platypii.avyalert.InfoActivity"
+			android:label="@string/app_name" >
+			<meta-data
+			    android:name="android.support.PARENT_ACTIVITY"
+			    android:value="com.platypii.avyalert.MainActivity" />
+		</activity>
+
+		<activity
+			android:name="com.platypii.avyalert.RoseInfoActivity"
 			android:label="@string/app_name" >
 			<meta-data
 			    android:name="android.support.PARENT_ACTIVITY"

@@ -50,9 +50,7 @@ public class Images {
     /** Downloads a bitmap. Synchronous (will block). */
     public static Bitmap fetchBitmap(URL url) {
         try {
-            URLConnection connection = url.openConnection();
-            connection.setUseCaches(true); // Enable device caching
-            InputStream is = connection.getInputStream();
+            InputStream is = getInputStream(url);
             // InputStream is = url.openStream();
             if(is != null) {
                 Bitmap bmp = BitmapFactory.decodeStream(is);
@@ -83,9 +81,7 @@ public class Images {
         try {
             if(!file.exists()) {
                 // Download to cache
-                URLConnection connection = url.openConnection();
-                connection.setUseCaches(true); // Enable device caching
-                InputStream is = connection.getInputStream();
+                InputStream is = getInputStream(url);
                 // InputStream is = url.openStream(); // One step
                 OutputStream os = new FileOutputStream(file);
                 // Copy input stream to file
@@ -123,9 +119,13 @@ public class Images {
                     Log.i("Main", "Error setting TrustManager", e);
                 }
                 // Connect to https
-                return imageUrl.openStream();
+                URLConnection connection = imageUrl.openConnection();
+                connection.setUseCaches(true); // Enable device caching
+                return connection.getInputStream();
             } else {
-                return imageUrl.openStream();
+                URLConnection connection = imageUrl.openConnection();
+                connection.setUseCaches(true); // Enable device caching
+                return connection.getInputStream();
             }
         } catch(IOException e) {
             Log.i("Main", "Error getting InputStream for URL", e);
