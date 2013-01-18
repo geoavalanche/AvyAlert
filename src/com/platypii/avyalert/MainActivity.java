@@ -1,6 +1,5 @@
 package com.platypii.avyalert;
 
-import java.io.IOException;
 import com.platypii.avyalert.R;
 import com.platypii.avyalert.data.Advisory;
 import com.platypii.avyalert.data.Callback;
@@ -299,8 +298,10 @@ public class MainActivity extends Activity {
         @Override
         public void onClick(View v) {
             if(currentRegion != null) {
-                // Open Advisory URL
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(currentRegion.advisoryUrl));
+                // Open Advisory Link
+                String url = currentRegion.advisoryLink;
+                if(url == null) url = currentRegion.advisoryUrl;
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                 startActivity(browserIntent);
             } else {
                 Log.w("MainActivity", "User clicked link, but no region selected. WTF?");
