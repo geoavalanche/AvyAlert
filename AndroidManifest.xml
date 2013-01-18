@@ -63,14 +63,6 @@
 			    android:value="com.platypii.avyalert.MainActivity" />
 		</activity>
 
-		<activity
-			android:name="com.platypii.avyalert.billing.BillingActivity"
-			android:label="AvyAlert: Settings" >
-			<meta-data
-			    android:name="android.support.PARENT_ACTIVITY"
-			    android:value="com.platypii.avyalert.SettingsActivity" />
-		</activity>
-		
 		<!-- Push Notification -->
 		<receiver
 		    android:name="com.google.android.gcm.GCMBroadcastReceiver"

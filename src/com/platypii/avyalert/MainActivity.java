@@ -263,8 +263,8 @@ public class MainActivity extends Activity {
                 protected Advisory doInBackground(Void... params) {
                     try {
                         return region.fetchAdvisory();
-                    } catch(IOException e) {
-                        Log.w(region.regionName, "Failed to download advisory");
+                    } catch(Exception e) {
+                        Log.w(region.regionName, "Failed to download advisory", e);
                         return null;
                     }
                 }

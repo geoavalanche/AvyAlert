@@ -22,6 +22,7 @@ public class Region {
     public String centerName;
     public String bannerUrl;
     public String advisoryUrl;
+    public String advisoryLink;
     public String dateSelector;
     public String ratingSelector;
     public String roseSelector;
@@ -153,7 +154,7 @@ public class Region {
         }
     }
     
-    /** Returns */
+    /** Cleans up urls */
     private String getURL(String str) {
         try {
             URL url = new URL(str);

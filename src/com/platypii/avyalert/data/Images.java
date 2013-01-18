@@ -87,8 +87,10 @@ public class Images {
                 // Copy input stream to file
                 byte[] buffer = new byte[1024];
                 int len;
-                while((len = is.read(buffer)) != -1) {
-                    os.write(buffer, 0, len);
+                if(is != null) {
+                    while((len = is.read(buffer)) != -1) {
+                        os.write(buffer, 0, len);
+                    }
                 }
                 os.close();
                 Log.v("Images", "Cache miss: " + url);

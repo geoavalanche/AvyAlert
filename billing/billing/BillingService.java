@@ -16,7 +16,6 @@
 
 package com.platypii.avyalert.billing;
 
-import com.android.vending.billing.IMarketBillingService;
 import com.platypii.avyalert.billing.Consts.ResponseCode;
 import com.platypii.avyalert.billing.Security.VerifiedPurchase;
 import android.app.PendingIntent;

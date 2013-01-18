@@ -1,7 +1,6 @@
 package com.platypii.avyalert;
 
 import com.platypii.avyalert.R;
-import com.platypii.avyalert.billing.BillingActivity;
 import com.platypii.avyalert.data.Regions;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
@@ -14,6 +13,7 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 
 public class SettingsActivity extends PreferenceActivity {
@@ -40,8 +40,8 @@ public class SettingsActivity extends PreferenceActivity {
                         return true;
                     } else {
                         // Open BillingActivity
-                        startActivity(new Intent(SettingsActivity.this, BillingActivity.class));
-                        // Toast.makeText(SettingsActivity.this, "Push notifications is a paid feature", Toast.LENGTH_SHORT).show();
+                        // TODO: startActivity(new Intent(SettingsActivity.this, BillingActivity.class));
+                        Toast.makeText(SettingsActivity.this, "Push notifications is a paid feature", Toast.LENGTH_SHORT).show();
                         return false;
                     }
                 }
