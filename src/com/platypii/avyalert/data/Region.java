@@ -42,7 +42,7 @@ public class Region {
         Log.v(regionName, "Fetching advisory: " + advisoryUrl);
 
         // Download advisory
-        Document doc = Jsoup.connect(advisoryUrl).get();
+        final Document doc = Jsoup.connect(advisoryUrl).timeout(10000).get();
         
         Log.v(regionName, "Received advisory");
         

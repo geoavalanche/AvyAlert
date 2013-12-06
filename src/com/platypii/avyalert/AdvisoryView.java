@@ -152,9 +152,13 @@ public class AdvisoryView extends RelativeLayout {
     
     /** Cleans the html and returns styled text ready for a TextView */
     private Spanned formatHtml(String html) {
-        // html = html.replaceAll("(?si)</?(img|a).*?>", ""); // Remove image and link tags
-        html = html.replaceAll("(?si)</?(img).*?>", ""); // Remove image tags
-       return Html.fromHtml(html);
+        if(html != null) {
+            // html = html.replaceAll("(?si)</?(img|a).*?>", ""); // Remove image and link tags
+            html = html.replaceAll("(?si)</?(img).*?>", ""); // Remove image tags
+           return Html.fromHtml(html);
+        } else {
+            return null;
+        }
     }
     
     /** Downloads an image and inserts into the given ImageView */
